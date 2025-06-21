@@ -4,7 +4,7 @@ const UserSchema = new mongoose.Schema(
   {
     auth: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: Auth,
+      ref: "Auth",
       required: true,
     },
     nombre: {
