@@ -1,4 +1,4 @@
-const moongose = require("mongoose");
+const mongoose = require("mongoose");
 
 const AuthSchema = new mongoose.Schema(
   {
