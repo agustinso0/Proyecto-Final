@@ -65,12 +65,10 @@ POSTGRES_PASSWORD=app_password
 NODE_ENV=development
 PORT=3001
 
-# Configuración de base de datos para Sequelize
+# Configuración de base de datos MongoDB
 DB_HOST=database
-DB_PORT=5432
+DB_PORT=27017
 DB_NAME=app_database
-DB_USER=app_user
-DB_PASSWORD=app_password
 
 # JWT para autenticación
 JWT_SECRET=mi_jwt_secret_super_seguro_para_desarrollo_2024
