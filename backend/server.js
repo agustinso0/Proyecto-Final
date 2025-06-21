@@ -3,8 +3,10 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 require("dotenv").config();
-const mongoose = require("mongoose");
-const { connectToDatabase } = require("./config/database");
+const {
+  connectToDatabase,
+  disconnectFromDatabase,
+} = require("./config/database");
 const routes = require("./routes");
 
 const app = express();
@@ -80,8 +82,7 @@ startServer();
 const gracefulShutdown = async () => {
   console.log("🛑 Shutting down gracefully...");
   try {
-    await mongoose.connection.close();
-    console.log("✅ MongoDB connection closed");
+    await disconnectFromDatabase();
   } catch (error) {
     console.error("Error closing MongoDB connection:", error);
   }
