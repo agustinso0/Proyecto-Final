@@ -10,9 +10,9 @@ async function seedCategories() {
   try {
     await connectToDatabase();
 
-    const categories = categoriesData.map((cat) => ({
-      ...cat,
-      _id: new mongoose.Types.ObjectId(cat._id),
+    const categories = categoriesData.map((v) => ({
+      ...v,
+      _id: new mongoose.Types.ObjectId(v._id),
     }));
 
     await Category.deleteMany({});
