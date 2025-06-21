@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
-const users = require("../data/users");
+const usersData = require("../data/users");
 const Auth = require("../models/Auth");
-const auths = require("../data/auths");
+const authsData = require("../data/auths");
 const {
   connectToDatabase,
   disconnectFromDatabase,
@@ -12,6 +12,16 @@ const {
 async function seedUsers() {
   try {
     await connectToDatabase();
+
+    const users = usersData.map((v) => ({
+      ...v,
+      _id: new mongoose.Types.ObjectId(v._id),
+    }));
+
+    const auths = authsData.map((v) => ({
+      ...v,
+      _id: new mongoose.Types.ObjectId(v._id),
+    }));
 
     await User.deleteMany({});
     await Auth.deleteMany({});
@@ -27,11 +37,11 @@ async function seedUsers() {
 
       await User.create({
         auth: authDoc._id,
-        nombre: users[i].nombre,
-        apellido: users[i].apellido,
+        firstname: users[i].firstname,
+        lastname: users[i].lastname,
         email: users[i].email,
-        direccion: users[i].direccion,
-        saldo: users[i].saldo,
+        address: users[i].address,
+        balance: users[i].balance,
       });
     }
 

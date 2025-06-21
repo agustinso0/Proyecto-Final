@@ -7,12 +7,12 @@ const UserSchema = new mongoose.Schema(
       ref: "Auth",
       required: true,
     },
-    nombre: {
+    firstname: {
       type: String,
       required: true,
       MinLength: 1,
     },
-    apellido: {
+    lastname: {
       type: String,
       required: true,
       MinLength: 1,
@@ -21,10 +21,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    direccion: {
+    address: {
       type: String,
     },
-    saldo: {
+    balance: {
       type: Number,
       default: 0,
     },
