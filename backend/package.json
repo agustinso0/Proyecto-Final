@@ -6,7 +6,12 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon --inspect=0.0.0.0:9229 server.js",
-    "test": "jest"
+    "test": "jest",
+    "seed:categories": "node seeders/categories.seeder.js",
+    "seed:transaction_types": "node seeders/transaction_types.seeder.js",
+    "seed:users": "node seeders/user.seeder.js",
+    "seed:transactions": "node seeders/transactions.seeder.js",
+    "seed:all": "npm run seed:categories && npm run seed:transaction_types && npm run seed:users && npm run seed:transactions"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -26,7 +31,12 @@
     "nodemon": "^3.0.1",
     "supertest": "^6.3.3"
   },
-  "keywords": ["express", "mongoose", "mongodb", "api"],
+  "keywords": [
+    "express",
+    "mongoose",
+    "mongodb",
+    "api"
+  ],
   "author": "Grupo 4",
   "license": "MIT"
 }
