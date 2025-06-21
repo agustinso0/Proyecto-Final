@@ -2,6 +2,8 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 
+let isConnected = false;
+
 const getMongoURI = (env = "development") => {
   const baseName = process.env.DB_NAME || "app_database";
   const dbName = env === "test" ? `${baseName}_test` : baseName;
@@ -14,6 +16,10 @@ const getMongoURI = (env = "development") => {
 const connectToDatabase = async (
   env = process.env.NODE_ENV || "development"
 ) => {
+  if (isConnected) {
+    return mongoose.connection;
+  }
+
   const uri = getMongoURI(env);
 
   try {
@@ -21,13 +27,24 @@ const connectToDatabase = async (
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log(`MongoDB connected successfully to ${uri}`);
+    isConnected = true;
+    console.log(`✅ MongoDB connected successfully to ${uri}`);
+    return mongoose.connection;
   } catch (error) {
-    console.error("MongoDB connection error:", error);
-    process.exit(1); // Detiene la app si no se puede conectar
+    console.error("❌ MongoDB connection error:", error);
+    process.exit(1);
+  }
+};
+
+const disconnectFromDatabase = async () => {
+  if (isConnected) {
+    await mongoose.disconnect();
+    isConnected = false;
+    console.log("🔌 MongoDB disconnected");
   }
 };
 
 module.exports = {
   connectToDatabase,
+  disconnectFromDatabase,
 };
