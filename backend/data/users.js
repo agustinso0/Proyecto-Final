@@ -1,23 +1,31 @@
+const mongoose = require("mongoose");
+
 module.exports = [
   {
-    nombre: "Juan",
-    apellido: "Pérez",
+    _id: "6856d110e61796d9786695b0",
+    auth: "6856d110e61796d9786695ae",
+    firstname: "Juan",
+    lastname: "Pérez",
     email: "juan@example.com",
-    direccion: "Calle Falsa 123",
-    saldo: 1000,
+    address: "Calle Falsa 123",
+    balance: 1000,
   },
   {
-    nombre: "María",
-    apellido: "Gómez",
+    _id: "6856d110e61796d9786695b4",
+    auth: "6856d110e61796d9786695b2",
+    firstname: "María",
+    lastname: "Gómez",
     email: "maria@example.com",
-    direccion: "Av. Siempre Viva 742",
-    saldo: 1500,
+    address: "Av. Siempre Viva 742",
+    balance: 1500,
   },
   {
-    nombre: "Agustin",
-    apellido: "Ferraro",
+    _id: "6856d110e61796d9786695b8",
+    auth: "6856d110e61796d9786695b6",
+    firstname: "Agustin",
+    lastname: "Ferraro",
     email: "agustin@example.com",
-    direccion: "Av. Super Falsa 666",
-    saldo: 3500,
+    address: "Av. Super Falsa 666",
+    balance: 3500,
   },
 ];
