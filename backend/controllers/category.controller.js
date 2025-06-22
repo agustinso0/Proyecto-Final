@@ -15,7 +15,7 @@ const getAllCategories = async (req, res) => {
 const deleteCategoryByName = async (req,res) => {
     try{
         const {name} = req.params;
-        const success = CategoryService.deleteCategoryByName(name)
+        const success = await CategoryService.deleteCategoryByName(name)
         if (success !== null){
             res.status(200).json(new ApiResponse(200, success, "Categoria eliminada correctamente"))
         }
@@ -28,7 +28,25 @@ const deleteCategoryByName = async (req,res) => {
     }
 }
 
+
+const createCategory = async (req, res) => {
+    try {
+        const {name} = req.body
+        const success = await CategoryService.createCategory(name)
+        if(success !== null){
+            res.status(201).json(new ApiResponse(200, success, "Categoria creada correctamente"))
+        }
+        else {
+            res.status(404).json(new ApiResponse(200, success, "Categoria no creada"))
+        }
+        
+    } catch (error) {
+        res.status(500).json(new ApiResponse(500, null, "Error al crear la categoria"))
+    }
+}
+
 module.exports = {
     getAllCategories,
-    deleteCategoryByName
+    deleteCategoryByName,
+    createCategory
 };
