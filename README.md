@@ -3,6 +3,7 @@
 ## 📋 Componentes Principales
 
 ### 🎯 Arquitectura General
+
 ```
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
 │   Nginx     │    │   React     │    │   Express   │
@@ -33,6 +34,7 @@
 ## 🏗️ Construcción Inicial
 
 ### 1️⃣ Preparación del Entorno
+
 ```bash
 # Crear estructura de proyecto
 ./setup-directories.sh mi-proyecto
@@ -45,12 +47,14 @@ cp .env.example .env
 ```
 
 ### 2️⃣ Configuración de Variables
+
 ```bash
 # Editar .env con tus valores
 nano .env
 ```
 
 Contenido del archivo `.env` para desarrollo (opcional, por si surge algún problema):
+
 ```env
 # ===========================================
 # BASE DE DATOS POSTGRESQL
@@ -72,9 +76,19 @@ DB_NAME=app_database
 
 # JWT para autenticación
 JWT_SECRET=mi_jwt_secret_super_seguro_para_desarrollo_2024
+JWT_EXPIRES_IN=7d
 
 # CORS - Permitir requests desde el frontend
 CORS_ORIGIN=http://localhost:3000
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Logging
+LOG_LEVEL=info
 
 # ===========================================
 # FRONTEND (REACT)
@@ -138,6 +152,7 @@ COOKIE_SAME_SITE=lax
 ```
 
 ### 3️⃣ Primera Construcción
+
 ```bash
 # Construir todas las imágenes
 docker-compose build
@@ -151,6 +166,7 @@ docker-compose up -d
 ## 🚀 Ejecución del Sistema
 
 ### Comandos Principales
+
 ```bash
 # Iniciar todos los servicios
 docker-compose up
@@ -172,11 +188,12 @@ docker-compose down -v
 ```
 
 ### URLs de Acceso
-- **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:3001/api
-- **Health Check:** http://localhost:3001/health
-- **Nginx Proxy:** http://localhost
-- **pgAdmin 4:** http://localhost:5050
+
+- **Frontend:** <http://localhost:3000>
+- **Backend API:** <http://localhost:3001/api>
+- **Health Check:** <http://localhost:3001/health>
+- **Nginx Proxy:** <http://localhost>
+- **pgAdmin 4:** <http://localhost:5050>
 - **Base de datos:** localhost:5432
 
 ---
@@ -184,11 +201,13 @@ docker-compose down -v
 ## 🔄 Desarrollo con Hot Reload
 
 ### Funcionamiento Automático
+
 - ✅ **React**: Cambios en `.js`, `.jsx`, `.css` → Recarga automática
 - ✅ **Express**: Cambios en `.js` → Reinicio con nodemon
 - ✅ **Base de datos**: Persistencia con volúmenes Docker
 
 ### Workflow de Desarrollo
+
 1. Modifica archivos en `frontend/src/` o `backend/`
 2. Los cambios se detectan automáticamente
 3. El servicio correspondiente se actualiza
@@ -199,7 +218,9 @@ docker-compose down -v
 ## ⚠️ Problemas Comunes y Soluciones
 
 ### 🔴 Error: "Cannot find module './models'"
+
 **Problema:** Faltan archivos básicos del backend
+
 ```bash
 # Solución
 mkdir -p backend/models backend/routes
@@ -207,7 +228,9 @@ mkdir -p backend/models backend/routes
 ```
 
 ### 🔴 Error: "Could not find index.html"
+
 **Problema:** React no encuentra archivos básicos
+
 ```bash
 # Solución
 mkdir -p frontend/public frontend/src
@@ -215,7 +238,9 @@ mkdir -p frontend/public frontend/src
 ```
 
 ### 🔴 Error: "psql: Is a directory"
+
 **Problema:** `init.sql` es carpeta en lugar de archivo
+
 ```bash
 # Solución
 rm -rf database/init.sql
@@ -224,7 +249,9 @@ touch database/init.sql
 ```
 
 ### 🔴 Error de credenciales Docker Desktop
+
 **Problema:** `error getting credentials - err: exec: "docker-credential-desktop.exe": executable file not found`
+
 ```bash
 # Solución: Reset de configuración Docker
 # Hacer backup de la configuración actual
@@ -238,7 +265,9 @@ docker compose build
 ```
 
 ### 🔴 Puerto ya en uso
+
 **Problema:** Servicios corriendo en puertos ocupados
+
 ```bash
 # Verificar puertos ocupados
 netstat -4 -tln | grep :3000
@@ -249,7 +278,9 @@ ports:
 ```
 
 ### 🔴 Error de permisos en Docker
+
 **Problema:** Permisos de archivos en contenedores
+
 ```bash
 # Solución
 sudo chown -R $USER:$USER .
@@ -257,7 +288,9 @@ chmod -R 755 .
 ```
 
 ### 🔴 Hot reload no funciona
+
 **Problema:** Cambios no se detectan automáticamente
+
 ```bash
 # Verificar variables de entorno
 CHOKIDAR_USEPOLLING=true
@@ -268,7 +301,9 @@ docker-compose restart frontend
 ```
 
 ### 🔴 Base de datos no conecta
+
 **Problema:** Backend no puede conectar a PostgreSQL
+
 ```bash
 # Verificar salud de la base de datos
 docker-compose ps database
@@ -286,6 +321,7 @@ docker-compose up --build
 ## 🛠️ Comandos de Mantenimiento
 
 ### Limpieza del Sistema
+
 ```bash
 # Limpiar contenedores parados
 docker container prune
@@ -303,6 +339,7 @@ docker-compose up
 ```
 
 ### Base de Datos y Administración
+
 ```bash
 # Ejecutar migraciones
 docker-compose exec backend npm run migrate
@@ -326,6 +363,7 @@ docker-compose exec -T database psql -U app_user -d app_database < backup.sql
 ```
 
 ### Backend - Migraciones y Sequelize
+
 ```bash
 # Acceder al shell del contenedor backend
 docker-compose exec backend sh
@@ -346,6 +384,7 @@ exit
 ```
 
 ### Frontend - Comandos de Desarrollo
+
 ```bash
 # Acceder al shell del contenedor frontend
 docker-compose exec frontend sh
@@ -364,6 +403,7 @@ exit
 ```
 
 ### Debugging
+
 ```bash
 # Acceder al contenedor del backend
 docker-compose exec backend sh
@@ -383,6 +423,7 @@ docker stats
 ## 📈 Escalabilidad y Producción
 
 ### Optimizaciones Recomendadas
+
 - **Multi-stage builds** para imágenes más pequeñas
 - **Health checks** más robustos
 - **Límites de recursos** en contenedores
@@ -390,6 +431,7 @@ docker stats
 - **Load balancing** con múltiples instancias
 
 ### Variables de Entorno de Producción
+
 ```env
 NODE_ENV=production
 POSTGRES_PASSWORD=contraseña_super_segura
@@ -426,6 +468,7 @@ proyecto/
 ```
 
 ### Debugging
+
 ```bash
 # Acceder al contenedor del backend
 docker-compose exec backend sh
@@ -455,6 +498,7 @@ docker-compose logs -f pgadmin
 ## 📈 Escalabilidad y Producción
 
 ### Optimizaciones Recomendadas
+
 - **Multi-stage builds** para imágenes más pequeñas
 - **Health checks** más robustos para todos los servicios
 - **Límites de recursos** en contenedores (CPU, memoria)
@@ -463,6 +507,7 @@ docker-compose logs -f pgadmin
 - **Separación de entornos** (desarrollo, staging, producción)
 
 ### Consideraciones de Seguridad
+
 - **Cambiar contraseñas por defecto** antes de producción
 - **Usar HTTPS** para todas las comunicaciones
 - **Configurar firewall** para limitar acceso a puertos
@@ -529,6 +574,7 @@ proyecto/
 ## 🎯 Tips y Mejores Prácticas
 
 ### Desarrollo Eficiente
+
 - **Usa hot reload** para ver cambios instantáneamente
 - **Consulta logs** regularmente para detectar errores temprano
 - **Usa pgAdmin** para explorar y modificar datos visualmente
@@ -536,12 +582,14 @@ proyecto/
 - **Haz backups** antes de cambios importantes en BD
 
 ### Gestión de Dependencias
+
 - **Actualiza package.json** cuando agregues nuevas dependencias
 - **Reconstruye imágenes** después de cambios en dependencies
 - **Usa volúmenes** para node_modules para mejorar rendimiento
 - **Sincroniza versiones** entre desarrollo y producción
 
 ### Resolución de Problemas
+
 1. **Verifica logs** primero: `docker-compose logs -f`
 2. **Comprueba estado** de contenedores: `docker-compose ps`
 3. **Reinicia servicios** específicos si es necesario
@@ -549,6 +597,7 @@ proyecto/
 5. **Reconstruye imágenes** como último recurso
 
 ### Comandos de Emergencia
+
 ```bash
 # Reiniciar todo el sistema
 docker-compose restart
@@ -567,14 +616,16 @@ docker system prune -a --volumes
 ## 🆘 Soporte y Recursos
 
 ### Documentación Oficial
-- **Docker Compose**: https://docs.docker.com/compose/
-- **React**: https://react.dev/
-- **Express**: https://expressjs.com/
-- **Sequelize**: https://sequelize.org/
-- **PostgreSQL**: https://www.postgresql.org/docs/
-- **pgAdmin**: https://www.pgadmin.org/docs/
+
+- **Docker Compose**: <https://docs.docker.com/compose/>
+- **React**: <https://react.dev/>
+- **Express**: <https://expressjs.com/>
+- **Sequelize**: <https://sequelize.org/>
+- **PostgreSQL**: <https://www.postgresql.org/docs/>
+- **pgAdmin**: <https://www.pgadmin.org/docs/>
 
 ### Comunidades y Ayuda
+
 - **Stack Overflow** para problemas específicos
 - **GitHub Issues** de cada proyecto
 - **Discord/Slack** de las comunidades
