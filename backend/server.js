@@ -79,7 +79,10 @@ async function startServer() {
           process.exit(0);
         } catch (error) {
           console.error("Error mientras se apagaba el servidor:", error);
-          logger.error("Ha ocurrido un error mientras se apaga el servidor:", error);
+          logger.error(
+            "Ha ocurrido un error mientras se apaga el servidor:",
+            error
+          );
           process.exit(1);
         }
       });
