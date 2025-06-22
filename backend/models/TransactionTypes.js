@@ -7,5 +7,4 @@ const TransactionTypeSchema = new mongoose.Schema({
     unique: true,
   },
 });
-
 module.exports = mongoose.model("TransactionType", TransactionTypeSchema);
