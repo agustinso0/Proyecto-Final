@@ -35,6 +35,20 @@ class CategoryService {
             throw new ApiError(500, null, "Error al crear la categoria")
         }
     }
+
+    static async getCategorieByName(nombre){
+        try {
+            const categoria = await Category.findOne({name: nombre})
+            if(!categoria){
+                throw new ApiError(404, null, "La categoria buscada no existe")
+            }else {
+                return categoria
+            }
+        } catch (error) {
+            throw new ApiError(500, null, "Error al encontrar la categoria")
+        }
+
+    }
 }
 
 

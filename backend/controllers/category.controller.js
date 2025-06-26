@@ -45,8 +45,25 @@ const createCategory = async (req, res) => {
     }
 }
 
+const getCategoryByName = async (req, res) => {
+    try {
+        const {name} = req.params;
+        const success = await CategoryService.getCategorieByName(name);
+        if(success){
+            res.status(200).json(new ApiResponse(200, success, "Categoria encontrada correctamente"));
+        }else{
+            res.status(404).json(new ApiResponse(404, null, "Categoria no encontrada"));
+        }
+    } catch (error) {
+        res.status(500).json(new ApiResponse(500, null, "Error al buscar la cetegoria"))
+    }
+}
+
+
+
 module.exports = {
     getAllCategories,
     deleteCategoryByName,
-    createCategory
+    createCategory,
+    getCategoryByName
 };
