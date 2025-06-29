@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const authRoutes = require("./auth.routes");
 const userRoutes = require("./user.routes");
+const categoryRoutes = require("./category.routes")
+const transactionRoutes = require("./transaction.routes");
+
 
 // Ruta de prueba
 router.get("/health", (req, res) => {
@@ -15,5 +18,7 @@ router.get("/health", (req, res) => {
 
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
+router.use("/categories", categoryRoutes);
+router.use("/transactions", transactionRoutes);
 
 module.exports = router;
