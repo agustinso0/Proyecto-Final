@@ -1,5 +1,4 @@
 # docker-compose.yml con hot reload optimizado
-version: "3.8"
 
 services:
   # Base de datos MongoDB
@@ -13,11 +12,6 @@ services:
       - mongo_data:/data/db
     networks:
       - app_network
-    healthcheck:
-      test: ["CMD", "mongo", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   # Backend con Express y Mongoose
   backend:
@@ -29,19 +23,18 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3001
-      MONGO_URI: mongodb://mongo:27017/app_database
+      MONGO_URI: mongodb://database:27017/app_database
       JWT_SECRET: your_jwt_secret_here
       CORS_ORIGIN: http://localhost:3000
     ports:
       - "3001:3001"
-      - "9229:9229" # Puerto para debugging
+      - "9229:9229"
     volumes:
       - ./backend:/app
       - /app/node_modules
       - backend_node_modules:/app/node_modules
     depends_on:
-      database:
-        condition: service_healthy
+      - database
     networks:
       - app_network
 

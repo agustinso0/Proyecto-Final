@@ -27,13 +27,15 @@ async function seedUsers() {
     await Auth.deleteMany({});
 
     for (let i = 0; i < auths.length; i++) {
-      const hashedPassword = await bcrypt.hash(auths[i].password, 10);
-
-      const authDoc = await Auth.create({
+      const authDoc = new Auth({
+        _id: auths[i]._id,
         username: auths[i].username,
-        password: hashedPassword,
+        password: auths[i].password,
         token: auths[i].token || null,
+        isActive: true,
       });
+
+      await authDoc.save();
 
       await User.create({
         auth: authDoc._id,
@@ -45,9 +47,9 @@ async function seedUsers() {
       });
     }
 
-    console.log("✅ Usuarios y Auth insertados correctamente");
+    console.log("Usuarios y Auth insertados correctamente");
   } catch (error) {
-    console.error("❌ Error al insertar usuarios:", error);
+    console.error("Error al insertar usuarios:", error);
   } finally {
     await disconnectFromDatabase();
   }
