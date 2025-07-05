@@ -2,9 +2,13 @@ const Category = require("../models/Category");
 const ApiError = require("../utils/ApiError");
 
 class CategoryService {
-    static async getAllCategories(){
+    static async getAllCategories(search){
         try {
-            const categories = await Category.find()
+            let query = {};
+            if(search){
+                query.name = { $regex: search, $options: 'i'} // busqueda case insensitive
+            }
+            const categories = await Category.find(query)
             return categories
         } catch (error) {
             throw new ApiError(500, null, "Error al al obtener las categorias", error)

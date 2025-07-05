@@ -86,7 +86,14 @@ Actualiza el balance (**protegida**).
 ## 📂 Categorías
 
 - **GET `/api/categories/`**  
-  Lista todas las categorías (**pública**).
+  Lista todas las categorías (**pública**).  
+  **Soporta búsqueda por nombre:**  
+  Filtrar categorías por nombre usando el query param `search`.  
+  Ejemplo:  
+  ```
+  GET /api/categories?search=tec
+  ```
+  Devuelve todas las categorías que contenga "tec" (busqueda case-insensitive)
 
 - **GET `/api/categories/:name`**  
   Busca una categoría por nombre (**pública**).

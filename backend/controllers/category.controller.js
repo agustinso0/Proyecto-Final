@@ -1,13 +1,14 @@
 const CategoryService = require("../services/category.service");
 const ApiResponse = require("../middleware/ApiResponse")
 
-const getAllCategories = async (req, res) => {
+const getAllCategories = async (req, res, next) => {
 
     try{
-        const categories = await CategoryService.getAllCategories();
+        const search = req.query.search || ""
+        const categories = await CategoryService.getAllCategories(search);
         res.status(200).json(new ApiResponse(200,categories,"Categorias encontradas correctamente"));
     }catch (error){
-        res.status(500).json(new ApiResponse(500,null,"Categorias no encontradas"));
+        next(error)
     }
 }
 
