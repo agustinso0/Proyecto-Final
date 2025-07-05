@@ -128,25 +128,6 @@ Lista todas las transacciones (**protegida**).
 
 ---
 
-## 🛡️ ¿Cómo funcionan las rutas protegidas?
-
-- Antes de ejecutar el controlador, pasa por el middleware `authenticate`.
-- Si el header `Authorization` no tiene un token válido, responde 401.
-- Si el token es válido, la petición sigue normalmente.
-
----
-
-## 🧪 ¿Cómo probar endpoints protegidos?
-
-1. **Haz login** en `/api/auth/login` y copia el token.
-2. **En Postman** (o fetch/axios), agrega el header:
-   ```
-   Authorization: Bearer TU_TOKEN_AQUI
-   ```
-3. **Haz la petición** al endpoint protegido.
-
----
-
 ## 🩺 Healthcheck
 
 ### GET `/api/health`
