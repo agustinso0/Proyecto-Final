@@ -7,7 +7,7 @@ const authenticate = async (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    throw new ApiError(401, "Token de acceso requerido");
+    return new ApiError(401, "Token de acceso requerido");
   }
 
   try {
@@ -15,13 +15,13 @@ const authenticate = async (req, res, next) => {
     const auth = await Auth.findById(decoded.id);
 
     if (!auth) {
-      throw new ApiError(401, "Token invalido");
+      return new ApiError(401, "Token invalido");
     }
 
     req.user = auth;
     next();
   } catch (error) {
-    throw new ApiError(401, "Token invalido");
+    return new ApiError(401, "Token invalido");
   }
 };
 

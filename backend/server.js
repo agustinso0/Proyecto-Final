@@ -52,6 +52,17 @@ app.use("*", (req, res) => {
   });
 });
 
+// evita que el back se caiga por errores no capturados
+
+app.use((err, req, res, next) => {
+  const status = err.statusCode || 500;
+  res.status(status).json({
+    success: false,
+    message: err.message || "Error interno del servidor",
+    error: process.env.NODE_ENV === "development" ? err.stack : undefined,
+  });
+});
+
 async function startServer() {
   try {
     await connectToDatabase();
