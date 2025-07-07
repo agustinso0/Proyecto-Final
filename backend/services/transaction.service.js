@@ -1,5 +1,5 @@
 const Transaction = require("../models/Transaction");
-const ApiError = require("../middleware/ApiResponse");
+const ApiError = require("../utils/ApiError");
 
 class TransactionService {
     static async getAllTransaction() {
@@ -8,7 +8,7 @@ class TransactionService {
             return transactions;
         } catch (error) {
             console.error('Error en getAllTransaction:', error);
-            throw new ApiError(500, null, "Error al obtener las transacciones");
+            throw new ApiError(500, "Error al obtener las transacciones");
         }
     }
 
@@ -26,7 +26,23 @@ class TransactionService {
             return savedTransaction;
         } catch (error) {
             console.error('Error en createTransaction:', error);
-            throw new ApiError(500, null, `Error al crear la transacción: ${error.message}`);
+            throw new ApiError(500, `Error al crear la transacción: ${error.message}`);
+        }
+    }
+
+    static async deleteTransaction(transactionId) {
+        try {
+            const deletedTransaction = await Transaction.findByIdAndDelete(transactionId);
+            if (!deletedTransaction) {
+                throw new ApiError(404, "Transacción no encontrada");
+            }
+            return deletedTransaction;
+        } catch (error) {
+            if (error instanceof ApiError) {
+                throw error;
+            }
+            console.error('Error en deleteTransaction:', error);
+            throw new ApiError(500, "Error al eliminar la transacción");
         }
     }
 
@@ -62,7 +78,7 @@ class TransactionService {
             };
         } catch (error) {
             console.error('Error en getSummary:', error);
-            throw new ApiError(500, null, "Error al obtener el resumen");
+            throw new ApiError(500, "Error al obtener el resumen");
         }
     }
 }
