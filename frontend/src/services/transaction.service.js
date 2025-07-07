@@ -50,8 +50,25 @@ const createTransaction = async (transactionData) => {
   }
 };
 
+const deleteTransaction = async (transactionId) => {
+  try {
+    const response = await fetch(`${API_URL}/${transactionId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    throw error;
+  }
+};
+
 export {
   getAllTransactions,
   getSummary,
   createTransaction,
+  deleteTransaction,
 }; 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllTransactions } from '../services/transaction.service';
+import { getAllTransactions, deleteTransaction } from '../services/transaction.service';
 
 const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
@@ -21,6 +21,19 @@ const TransactionList = () => {
       setError('Error al cargar las transacciones');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (transactionId) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar esta transacción?')) {
+      try {
+        await deleteTransaction(transactionId);
+        // actualizamos la lista despues de eliminar
+        loadTransactions();
+      } catch (error) {
+        console.error('Error al eliminar la transacción:', error);
+        setError('Error al eliminar la transacción');
+      }
     }
   };
 
@@ -66,6 +79,12 @@ const TransactionList = () => {
                 {transaction.description}
               </div>
             )}
+            <button 
+              onClick={() => handleDelete(transaction._id)}
+              className="delete-button"
+            >
+              Eliminar
+            </button>
           </div>
         ))}
       </div>
