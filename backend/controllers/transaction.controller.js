@@ -10,6 +10,21 @@ const getAllTransactions = async (req, res) => {
     }
 };
 
+const createTransaction = async (req, res) => {
+    try {
+        const transactionData = {
+            amount: req.body.amount,
+            type: req.body.type,
+            category: req.body.category,
+            description: req.body.description
+        };
+        const transaction = await TransactionService.createTransaction(transactionData);
+        res.status(201).json(new ApiResponse(201, transaction, "Transacción creada correctamente"));
+    } catch (error) {
+        console.error('Error al crear transacción:', error);
+        res.status(500).json(new ApiResponse(500, null, "Error al crear la transacción"));
+    }
+};
 
 const getSummary = async (req, res, next) => {
     try {
@@ -26,8 +41,8 @@ const getSummary = async (req, res, next) => {
     }
 };
 
-
 module.exports = {
     getAllTransactions,
+    createTransaction,
     getSummary
 };

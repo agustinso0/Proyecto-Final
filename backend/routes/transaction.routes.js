@@ -1,13 +1,11 @@
 const express = require('express');
-const {getAllTransactions} = require("../controllers/transaction.controller");
+const {getAllTransactions, createTransaction} = require("../controllers/transaction.controller");
 const {getSummary} = require("../controllers/transaction.controller")
-const {authenticate} = require("../middleware/auth");
 const router = express.Router();
 
-
-router.use(authenticate);
-//Ruta protegida
+// Rutas sin autenticación para desarrollo
 router.get("/", getAllTransactions);
-router.get("/summary", authenticate, getSummary);
+router.get("/summary", getSummary);
+router.post("/", createTransaction);
 
 module.exports = router;
