@@ -10,6 +10,24 @@ const getAllTransactions = async (req, res) => {
     }
 };
 
+
+const getSummary = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const summary = await TransactionService.getSummary(userId);
+        res.status(200).json({
+            statusCode: 200,
+            data: summary,
+            message: "Resumen generado correctamente",
+            success: true
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 module.exports = {
-    getAllTransactions
+    getAllTransactions,
+    getSummary
 };
