@@ -123,6 +123,10 @@ Todas las rutas son **protegidas**.
 ### GET `/api/transactions/`
 Lista todas las transacciones (**protegida**).
 
+### GET `/api/transactions/summary`
+Lista un resumen de las transacciones (**protegida**).
+
+
 **Header:**  
 `Authorization: Bearer <token>`
 
