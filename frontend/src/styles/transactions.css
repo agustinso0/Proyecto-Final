@@ -66,7 +66,7 @@
   border-top: 1px solid #eee;
   margin-top: 8px;
   padding-top: 8px;
-  margin-bottom: 35px; 
+  margin-bottom: 35px; /* Espacio para el botón de eliminar */
 }
 
 .delete-button {
@@ -88,13 +88,19 @@
 }
 
 /* Form styles */
-.transaction-form {
+.transaction-form, .category-form {
   max-width: 500px;
   margin: 20px auto;
   padding: 20px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.category-form {
+  margin-top: 40px;
+  border-top: 2px solid #eee;
+  padding-top: 30px;
 }
 
 .form-group {
@@ -173,12 +179,19 @@ button[type="submit"]:active {
   border: 1px solid #c3e6cb;
   font-size: 14px;
 }
+
+.forms-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
 @media (max-width: 768px) {
   .transaction-grid {
     grid-template-columns: 1fr;
   }
   
-  .transaction-form {
+  .transaction-form, .category-form {
     margin: 20px;
   }
 } 

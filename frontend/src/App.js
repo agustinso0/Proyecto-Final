@@ -15,7 +15,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Gestor Financiero</h1>
+        <h1>Control de gastos Personales</h1>
       </header>
       <main>
         <TransactionForm onTransactionCreated={handleTransactionCreated} />
