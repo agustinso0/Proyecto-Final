@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createTransaction } from '../services/transaction.service';
+import { getAllCategories } from '../services/category.service';
 
 const TransactionForm = ({ onTransactionCreated }) => {
-
-
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     amount: '',
     type: 'expense',
@@ -12,6 +12,27 @@ const TransactionForm = ({ onTransactionCreated }) => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const categoriesData = await getAllCategories();
+      setCategories(categoriesData);
+      // Si hay categorías, seleccionar la primera por defecto
+      if (categoriesData.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          category: categoriesData[0].name
+        }));
+      }
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
+      setError('Error al cargar las categorías');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +55,7 @@ const TransactionForm = ({ onTransactionCreated }) => {
       setFormData({
         amount: '',
         type: 'expense',
-        category: '',
+        category: categories.length > 0 ? categories[0].name : '',
         description: ''
       });
       
@@ -85,15 +106,19 @@ const TransactionForm = ({ onTransactionCreated }) => {
 
         <div className="form-group">
           <label htmlFor="category">Categoría</label>
-          <input
-            type="text"
+          <select
             id="category"
             name="category"
             value={formData.category}
             onChange={handleChange}
             required
-            placeholder="Ej: Comida, Transporte, Salario"
-          />
+          >
+            {categories.map((category) => ( // toma las categorias ya existentes
+              <option key={category._id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-group">
