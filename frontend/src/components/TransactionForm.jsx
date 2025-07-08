@@ -22,7 +22,7 @@ const TransactionForm = ({ onTransactionCreated }) => {
     try {
       const categoriesData = await getAllCategories();
       setCategories(categoriesData);
-      // Si hay categorías, seleccionar la primera por defecto
+      // seleccionar la primera por defecto
       if (categoriesData.length > 0) {
         setFormData(prev => ({
           ...prev,
@@ -88,7 +88,7 @@ const TransactionForm = ({ onTransactionCreated }) => {
               onChange={handleChange}
               required
               min="0"
-              step="0.01"
+              step="100.00"
             />
           </div>
 
