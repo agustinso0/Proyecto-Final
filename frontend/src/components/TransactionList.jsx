@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getAllTransactions, deleteTransaction } from '../services/transaction.service';
+import BalanceCard from './BalanceCard';
 
 const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
@@ -39,8 +40,8 @@ const TransactionList = () => {
 
   const formatAmount = (amount) => {
     return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
+      style: 'currency', 
+      currency: 'ARS' // formatea la moneda a pesos
     }).format(amount);
   };
 
@@ -57,12 +58,15 @@ const TransactionList = () => {
   }
 
   return (
+
+    
     <div className="transaction-list">
+      <BalanceCard transactions={transactions} />
       <h2>Transacciones</h2>
       <div className="transaction-grid">
         {transactions.map((transaction) => (
-          <div 
-            key={transaction._id || Math.random()} 
+          <div
+            key={transaction._id || Math.random()}
             className={`transaction-card ${transaction.type}`}
           >
             <div className="amount">
@@ -79,7 +83,7 @@ const TransactionList = () => {
                 {transaction.description}
               </div>
             )}
-            <button 
+            <button
               onClick={() => handleDelete(transaction._id)}
               className="delete-button"
             >
