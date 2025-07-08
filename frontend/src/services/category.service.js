@@ -6,12 +6,12 @@ const getAllCategories = async () => {
   try {
     const response = await fetch(API_URL);
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(response.status);
     }
     const data = await response.json();
     return data.data || [];
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    console.error('Error llamando las categorias:', error);
     return [];
   }
 };
@@ -26,12 +26,12 @@ const createCategory = async (name) => {
       body: JSON.stringify({ name }),
     });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(response.status);
     }
     const data = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error creating category:', error);
+    console.error('Error creando la categoria:', error);
     throw error;
   }
 };

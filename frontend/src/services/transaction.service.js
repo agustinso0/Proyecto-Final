@@ -5,30 +5,16 @@ const getAllTransactions = async () => {
   try {
     const response = await fetch(API_URL);
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(response.status);
     }
     const data = await response.json();
-    console.log('API Response:', data); // Para debug
     return data.data ? data : { data: [] };
   } catch (error) {
-    console.error('Error fetching transactions:', error);
+    console.error(error);
     return { data: [] };
   }
 };
 
-const getSummary = async () => {
-  try {
-    const response = await fetch(`${API_URL}/summary`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.data ? data : { data: {} };
-  } catch (error) {
-    console.error('Error fetching summary:', error);
-    return { data: {} };
-  }
-};
 
 const createTransaction = async (transactionData) => {
   try {
@@ -40,12 +26,12 @@ const createTransaction = async (transactionData) => {
       body: JSON.stringify(transactionData),
     });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(response.status);
     }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error creating transaction:', error);
+    console.error('Error creando la transaccion:', error);
     throw error;
   }
 };
@@ -56,19 +42,18 @@ const deleteTransaction = async (transactionId) => {
       method: 'DELETE',
     });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(response.status);
     }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error deleting transaction:', error);
+    console.error('Error borrando la transaccion:', error);
     throw error;
   }
 };
 
 export {
   getAllTransactions,
-  getSummary,
   createTransaction,
   deleteTransaction,
 }; 
