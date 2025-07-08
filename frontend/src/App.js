@@ -14,9 +14,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
         <h1>Control de gastos Personales</h1>
-      </header>
       <main>
         <TransactionForm onTransactionCreated={handleTransactionCreated} />
         <TransactionList key={shouldRefresh} />
