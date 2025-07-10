@@ -1,0 +1,2 @@
+Fixear:
+cuando creo una categoria q existe crashea el back

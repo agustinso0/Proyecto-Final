@@ -10,6 +10,13 @@ class CategoryService {
         const nuevaCategoria = new Category({ name: nombre });
         return await nuevaCategoria.save();
     }
+
+    static async deleteCategory(id) {
+    return await Category.findByIdAndDelete(id);
+    }
+
 }
+
+
 
 module.exports = CategoryService;
