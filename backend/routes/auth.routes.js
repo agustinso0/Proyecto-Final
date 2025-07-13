@@ -2,19 +2,20 @@ const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
 const {
-  authValidationRules,
+  registerValidationRules,
   loginValidationRules,
+  changePasswordValidationRules,
 } = require("../validators/auth.validator");
 const validateRequest = require("../middleware/validateRequest");
 const { authenticate } = require("../middleware/auth");
 
-// Publica
 router.post(
   "/register",
-  authValidationRules(),
+  registerValidationRules(),
   validateRequest,
   authController.register
 );
+
 router.post(
   "/login",
   loginValidationRules(),
@@ -22,9 +23,19 @@ router.post(
   authController.login
 );
 
-// Protegida
 router.use(authenticate);
+
 router.post("/logout", authController.logout);
-router.put("/change-password", authController.changePassword);
+
+router.put(
+  "/change-password",
+  changePasswordValidationRules(),
+  validateRequest,
+  authController.changePassword
+);
+
+router.get("/sessions", authController.getUserSessions);
+
+router.delete("/sessions/:sessionId", authController.invalidateSession);
 
 module.exports = router;
