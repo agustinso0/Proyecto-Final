@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
-import { createCategory } from '../services/category.service';
+import React, { useState } from "react";
+import { createCategory } from "../services/category.service";
 
 const CategoryForm = ({ onCategoryCreated }) => {
-  const [categoryName, setCategoryName] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [categoryName, setCategoryName] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     if (!categoryName.trim()) {
-      setError('El nombre de la categoría no puede estar vacío');
+      setError("El nombre de la categoría no puede estar vacío");
       return;
     }
 
     try {
       await createCategory(categoryName.trim());
-      setSuccess('¡Categoría creada exitosamente!');
-      setCategoryName('');
+      setSuccess("¡Categoría creada exitosamente!");
+      setCategoryName("");
       if (onCategoryCreated) {
         onCategoryCreated();
       }
     } catch (error) {
-      setError(error.message || 'Error al crear la categoría');
+      setError(error.message || "Error al crear la categoría");
     }
   };
 
@@ -51,4 +51,4 @@ const CategoryForm = ({ onCategoryCreated }) => {
   );
 };
 
-export default CategoryForm; 
+export default CategoryForm;
