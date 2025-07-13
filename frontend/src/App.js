@@ -3,11 +3,9 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { useAuth } from "./hooks/useAuth";
 import { AuthProvider } from "./context/AuthContext";
 import { LoginForm, RegisterForm } from "./components/auth";
-import TransactionList from "./components/TransactionList";
-import TransactionForm from "./components/TransactionForm";
+import TransactionManagement from "./components/TransactionManagement";
 import UserList from "./components/users/UserList";
-import CategoryList from "./components/CategoryList";
-import CategoryForm from "./components/CategoryForm";
+import CategoryManagement from "./components/CategoryManagement";
 import "./App.css";
 import "./styles/Main.css";
 import "./styles/transactions.css";
@@ -15,11 +13,6 @@ import "./styles/transactions.css";
 const AppContent = () => {
   const { user, isAuthenticated, isLoading, logout, isLoggingOut } = useAuth();
   const [activeTab, setActiveTab] = useState("transactions");
-  const [shouldRefresh, setShouldRefresh] = useState(0);
-
-  const handleTransactionCreated = () => {
-    setShouldRefresh((prev) => prev + 1);
-  };
 
   const handleLogout = async () => {
     try {
@@ -91,14 +84,8 @@ const AppContent = () => {
         {activeTab === "transactions" && (
           <div className="tab-content">
             <div className="section">
-              <h2>Nueva Transacción</h2>
-              <TransactionForm
-                onTransactionCreated={handleTransactionCreated}
-              />
-            </div>
-            <div className="section">
-              <h2>Lista de Transacciones</h2>
-              <TransactionList key={shouldRefresh} />
+              <h2>Administrar Transacciones</h2>
+              <TransactionManagement />
             </div>
           </div>
         )}
@@ -106,12 +93,8 @@ const AppContent = () => {
         {activeTab === "categories" && (
           <div className="tab-content">
             <div className="section">
-              <h2>Nueva Categoría</h2>
-              <CategoryForm />
-            </div>
-            <div className="section">
-              <h2>Lista de Categorías</h2>
-              <CategoryList />
+              <h2>Administrar Categorías</h2>
+              <CategoryManagement />
             </div>
           </div>
         )}
@@ -119,7 +102,7 @@ const AppContent = () => {
         {activeTab === "users" && (
           <div className="tab-content">
             <div className="section">
-              <h2>Gestión de Usuarios</h2>
+              <h2>Administrar Usuarios</h2>
               <UserList />
             </div>
           </div>
