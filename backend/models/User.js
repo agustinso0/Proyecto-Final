@@ -61,6 +61,7 @@ const UserSchema = new mongoose.Schema(
 
 UserSchema.index({ email: 1 });
 UserSchema.index({ auth: 1 });
+UserSchema.index({ auth: 1, email: 1 });
 
 UserSchema.virtual("fullName").get(function () {
   return `${this.firstname} ${this.lastname}`;
