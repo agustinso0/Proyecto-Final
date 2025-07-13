@@ -14,8 +14,8 @@ import {
   formatUserForCreate,
   formatUserForUpdate,
   validateBalanceOperation,
-  createValidationError,
 } from "../services/user.service";
+import { createValidationError } from "../services/utils/createValidationError";
 import { handleApiError } from "../utils/errorHandler";
 
 export const useUsers = () => {
