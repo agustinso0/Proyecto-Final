@@ -1,6 +1,6 @@
 //encapsulamiento de la logica para consumir la api del back
 
-const API_URL = 'http://localhost:3001/api/categories';
+const API_URL = "http://localhost:3001/api/categories";
 
 const getAllCategories = async () => {
   try {
@@ -11,7 +11,7 @@ const getAllCategories = async () => {
     const data = await response.json();
     return data.data || [];
   } catch (error) {
-    console.error('Error llamando las categorias:', error);
+    console.error("Error llamando las categorias:", error);
     return [];
   }
 };
@@ -19,9 +19,9 @@ const getAllCategories = async () => {
 const createCategory = async (name) => {
   try {
     const response = await fetch(API_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ name }),
     });
@@ -31,12 +31,9 @@ const createCategory = async (name) => {
     const data = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error creando la categoria:', error);
+    console.error("Error creando la categoria:", error);
     throw error;
   }
 };
 
-export {
-  getAllCategories,
-  createCategory,
-};
+export { getAllCategories, createCategory };
