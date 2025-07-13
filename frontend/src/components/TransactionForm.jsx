@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { createTransaction } from '../services/transaction.service';
-import { getAllCategories } from '../services/category.service';
-import CategoryForm from './CategoryForm';
+import React, { useState, useEffect } from "react";
+import { createTransaction } from "../services/transaction.service";
+import { getAllCategories } from "../services/category.service";
+import CategoryForm from "./CategoryForm";
 
 const TransactionForm = ({ onTransactionCreated }) => {
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
-    amount: '',
-    type: 'expense',
-    category: '',
-    description: ''
+    amount: "",
+    type: "expense",
+    category: "",
+    description: "",
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     loadCategories();
@@ -24,50 +24,50 @@ const TransactionForm = ({ onTransactionCreated }) => {
       setCategories(categoriesData);
       // seleccionar la primera por defecto
       if (categoriesData.length > 0) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          category: categoriesData[0].name
+          category: categoriesData[0].name,
         }));
       }
     } catch (error) {
-      console.error('Error al cargar categorías:', error);
-      setError('Error al cargar las categorías');
+      console.error("Error al cargar categorías:", error);
+      setError("Error al cargar las categorías");
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    
+    setError("");
+    setSuccess("");
+
     try {
-      console.log('Enviando datos:', formData);
+      console.log("Enviando datos:", formData);
       const result = await createTransaction(formData);
-      console.log('Respuesta:', result);
-      
+      console.log("Respuesta:", result);
+
       setFormData({
-        amount: '',
-        type: 'expense',
-        category: categories.length > 0 ? categories[0].name : '',
-        description: ''
+        amount: "",
+        type: "expense",
+        category: categories.length > 0 ? categories[0].name : "",
+        description: "",
       });
-      
-      setSuccess('¡Transacción creada!');
-      
+
+      setSuccess("¡Transacción creada!");
+
       if (onTransactionCreated) {
         onTransactionCreated();
       }
     } catch (error) {
-      console.error('Error al crear transacción:', error);
-      setError('Error al crear la transacción. Por favor, intenta de nuevo.');
+      console.error("Error al crear transacción:", error);
+      setError("Error al crear la transacción. Por favor, intenta de nuevo.");
     }
   };
 
@@ -115,11 +115,15 @@ const TransactionForm = ({ onTransactionCreated }) => {
               onChange={handleChange}
               required
             >
-              {categories.map((category) => ( // toma las categorias ya existentes
-                <option key={category._id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
+              {categories.map(
+                (
+                  category // toma las categorias ya existentes
+                ) => (
+                  <option key={category._id} value={category.name}>
+                    {category.name}
+                  </option>
+                )
+              )}
             </select>
           </div>
 
@@ -143,4 +147,4 @@ const TransactionForm = ({ onTransactionCreated }) => {
   );
 };
 
-export default TransactionForm; 
+export default TransactionForm;
