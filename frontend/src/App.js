@@ -70,19 +70,19 @@ const AppContent = () => {
             }`}
             onClick={() => setActiveTab("transactions")}
           >
-            📊 Transacciones
+            Transacciones
           </button>
           <button
             className={`tab-btn ${activeTab === "categories" ? "active" : ""}`}
             onClick={() => setActiveTab("categories")}
           >
-            🏷️ Categorías
+            Categorías
           </button>
           <button
             className={`tab-btn ${activeTab === "users" ? "active" : ""}`}
             onClick={() => setActiveTab("users")}
           >
-            👥 Usuarios
+            Usuarios
           </button>
         </div>
       </nav>
