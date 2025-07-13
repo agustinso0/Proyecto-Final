@@ -54,7 +54,17 @@ AuthSchema.pre("save", async function (next) {
   }
 });
 
+AuthSchema.virtual("user", {
+  ref: "User",
+  localField: "_id",
+  foreignField: "auth",
+  justOne: true,
+});
+
+AuthSchema.set("toJSON", { virtuals: true });
+
 AuthSchema.methods.comparePassword = async function (password) {
+  if (!this.password) return false;
   return bcrypt.compare(password, this.password);
 };
 
