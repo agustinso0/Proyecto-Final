@@ -5,8 +5,7 @@ export { default as UserCard } from "./users/UserCard";
 export { default as TransactionList } from "./TransactionList";
 export { default as TransactionForm } from "./TransactionForm";
 
-export { default as CategoryForm } from "./CategoryForm";
-export { default as CategoryList } from "./CategoryList";
+export { default as CategoryList } from "./CategoryManagement";
 
 export { default as BalanceCard } from "./BalanceCard";
 
