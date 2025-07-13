@@ -1,40 +1,36 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
 
 const AuthSchema = new mongoose.Schema(
   {
-    username: {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "La referencia al usuario es obligatoria"],
+    },
+    sessionToken: {
       type: String,
-      required: [true, "El nombre de usuario es obligatorio"],
+      required: [true, "El token de sesión es obligatorio"],
       unique: true,
-      trim: true,
-      minlength: [3, "El nombre de usuario debe tener al menos 3 caracteres"],
-      maxlength: [30, "El nombre de usuario no puede exceder 30 caracteres"],
-    },
-    password: {
-      type: String,
-      required: [true, "La contraseña es obligatoria"],
-      minlength: [6, "La contraseña debe tener al menos 6 caracteres"],
-      select: false,
-    },
-    token: {
-      type: String,
       select: false,
     },
     isActive: {
       type: Boolean,
       default: true,
     },
-    lastLogin: {
+    loginAt: {
       type: Date,
+      default: Date.now,
+    },
+    expiresAt: {
+      type: Date,
+      required: [true, "La fecha de expiración es obligatoria"],
     },
   },
   {
     timestamps: true,
     toJSON: {
       transform: function (doc, ret) {
-        delete ret.password;
-        delete ret.token;
+        delete ret.sessionToken;
         delete ret.__v;
         return ret;
       },
@@ -42,35 +38,40 @@ const AuthSchema = new mongoose.Schema(
   }
 );
 
-AuthSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+AuthSchema.index({ user: 1 });
+AuthSchema.index({ sessionToken: 1 });
+AuthSchema.index({ expiresAt: 1 });
+AuthSchema.index({ user: 1, isActive: 1 });
 
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-
-AuthSchema.virtual("user", {
+AuthSchema.virtual("userInfo", {
   ref: "User",
-  localField: "_id",
-  foreignField: "auth",
+  localField: "user",
+  foreignField: "_id",
   justOne: true,
 });
 
 AuthSchema.set("toJSON", { virtuals: true });
 
-AuthSchema.methods.comparePassword = async function (password) {
-  if (!this.password) return false;
-  return bcrypt.compare(password, this.password);
+AuthSchema.methods.isSessionActive = function () {
+  return this.isActive && this.expiresAt > new Date();
 };
 
-AuthSchema.methods.updateLastLogin = function () {
-  this.lastLogin = new Date();
+AuthSchema.methods.invalidateSession = function () {
+  this.isActive = false;
   return this.save();
 };
+
+AuthSchema.methods.extendSession = function (hours = 24) {
+  this.expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
+  return this.save();
+};
+
+AuthSchema.pre("find", function () {
+  this.where({ expiresAt: { $gt: new Date() } });
+});
+
+AuthSchema.pre("findOne", function () {
+  this.where({ expiresAt: { $gt: new Date() } });
+});
 
 module.exports = mongoose.model("Auth", AuthSchema);
