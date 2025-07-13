@@ -1,8 +1,9 @@
 const express = require('express');
 const {getAllTransactions, createTransaction, deleteTransaction, getSummary} = require("../controllers/transaction.controller");
+const { authenticate } = require('../middleware/auth');
 const router = express.Router();
 
-// Rutas sin autenticación para desarrollo
+router.use(authenticate);
 router.get("/", getAllTransactions);
 router.get("/summary", getSummary);
 router.post("/", createTransaction);
