@@ -5,9 +5,9 @@ const Auth = require("../models/Auth");
 
 const authenticate = async (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
-
-  if (!token) {
-    return new ApiError(401, "Token de acceso requerido");
+  
+  if (!token || token === "null" || token === "undefined") {
+    return next(new ApiError(401, "Token de acceso requerido"));
   }
 
   try {
@@ -15,13 +15,13 @@ const authenticate = async (req, res, next) => {
     const auth = await Auth.findById(decoded.id);
 
     if (!auth) {
-      return new ApiError(401, "Token invalido");
+      return next(new ApiError(401, "Token inválido"));
     }
 
     req.user = auth;
     next();
   } catch (error) {
-    return new ApiError(401, "Token invalido");
+    return next(new ApiError(401, "Token inválido"));
   }
 };
 
