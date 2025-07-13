@@ -1,13 +1,8 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const UserSchema = new mongoose.Schema(
   {
-    auth: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Auth",
-      required: [true, "La referencia de autenticacion es obligatoria"],
-      unique: true,
-    },
     firstname: {
       type: String,
       required: [true, "El nombre es obligatorio"],
@@ -33,6 +28,12 @@ const UserSchema = new mongoose.Schema(
         "Por favor ingresa un email valido",
       ],
     },
+    password: {
+      type: String,
+      required: [true, "La contraseña es obligatoria"],
+      minlength: [6, "La contraseña debe tener al menos 6 caracteres"],
+      select: false,
+    },
     address: {
       type: String,
       trim: true,
@@ -52,6 +53,7 @@ const UserSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: {
       transform: function (doc, ret) {
+        delete ret.password;
         delete ret.__v;
         return ret;
       },
@@ -60,13 +62,46 @@ const UserSchema = new mongoose.Schema(
 );
 
 UserSchema.index({ email: 1 });
-UserSchema.index({ auth: 1 });
-UserSchema.index({ auth: 1, email: 1 });
+
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  try {
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 UserSchema.virtual("fullName").get(function () {
   return `${this.firstname} ${this.lastname}`;
 });
 
+UserSchema.virtual("authSessions", {
+  ref: "Auth",
+  localField: "_id",
+  foreignField: "user",
+  justOne: false,
+});
+
 UserSchema.set("toJSON", { virtuals: true });
+
+UserSchema.methods.comparePassword = async function (password) {
+  if (!this.password) {
+    const userWithPassword = await this.constructor
+      .findById(this._id)
+      .select("+password");
+    if (!userWithPassword || !userWithPassword.password) return false;
+    return bcrypt.compare(password, userWithPassword.password);
+  }
+  return bcrypt.compare(password, this.password);
+};
+
+UserSchema.methods.isValidEmail = function () {
+  const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+  return emailRegex.test(this.email);
+};
 
 module.exports = mongoose.model("User", UserSchema);
