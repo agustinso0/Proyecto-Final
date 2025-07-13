@@ -1,7 +1,7 @@
 # docker-compose.yml con hot reload optimizado
 
 services:
-  # Base de datos MongoDB
+  # Base de datos MongoDB con Replica Set
   database:
     image: mongo:7
     container_name: app_mongo
@@ -10,6 +10,10 @@ services:
       - "27018:27017"
     volumes:
       - mongo_data:/data/db
+      - ./scripts/init-replica.js:/docker-entrypoint-initdb.d/init-replica.js:ro
+    environment:
+      - MONGO_INITDB_DATABASE=app_database
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     networks:
       - app_network
 
