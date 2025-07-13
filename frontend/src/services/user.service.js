@@ -103,7 +103,3 @@ const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
-
-export const createValidationError = (errors) => {
-  return new ApiError(errors.join(", "), 422, "Validation Error", { errors });
-};
