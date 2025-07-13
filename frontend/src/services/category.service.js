@@ -1,39 +1,49 @@
-//encapsulamiento de la logica para consumir la api del back
+import { ApiError } from "../utils/ApiError";
 
-const API_URL = "http://localhost:3001/api/categories";
+export const validateCategoryDataForCreation = (categoryData) => {
+  const errors = [];
 
-const getAllCategories = async () => {
+  if (!categoryData.name || categoryData.name.trim().length < 2) {
+    errors.push("El nombre debe tener al menos 2 caracteres");
+  }
+
+  return errors;
+};
+
+export const validateCategoryDataForEdit = (categoryData) => {
+  const errors = [];
+
+  if (!categoryData.name || categoryData.name.trim().length < 2) {
+    errors.push("El nombre debe tener al menos 2 caracteres");
+  }
+
+  return errors;
+};
+
+export const formatCategoryForCreate = (categoryData) => {
   try {
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error(response.status);
-    }
-    const data = await response.json();
-    return data.data || [];
+    return {
+      name: categoryData.name?.trim(),
+    };
   } catch (error) {
-    console.error("Error llamando las categorias:", error);
-    return [];
+    throw new ApiError(
+      "Error al formatear datos de categoría para creación",
+      400,
+      "Bad Request"
+    );
   }
 };
 
-const createCategory = async (name) => {
+export const formatCategoryForUpdate = (categoryData) => {
   try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name }),
-    });
-    if (!response.ok) {
-      throw new Error(response.status);
-    }
-    const data = await response.json();
-    return data.data;
+    return {
+      name: categoryData.name?.trim(),
+    };
   } catch (error) {
-    console.error("Error creando la categoria:", error);
-    throw error;
+    throw new ApiError(
+      "Error al formatear datos de categoría para actualización",
+      400,
+      "Bad Request"
+    );
   }
 };
-
-export { getAllCategories, createCategory };
