@@ -18,12 +18,20 @@ export default function TransactionManagement() {
     description: "",
   });
 
+  // Estados para los filtros
+  const [filters, setFilters] = useState({
+    category: "",
+    startDate: "",
+    endDate: "",
+  });
+  const [showFilters, setShowFilters] = useState(false);
+
   // Hooks
   const {
     data: transactions,
     isLoading: transactionsLoading,
     error: transactionsError,
-  } = useTransactions();
+  } = useTransactions(filters);
   const { data: summary, isLoading: summaryLoading } = useTransactionSummary();
   const { data: categories } = useCategories();
   const { createTransaction, updateTransaction, deleteTransaction } =
@@ -90,6 +98,28 @@ export default function TransactionManagement() {
     }));
   };
 
+  // Manejar cambios en los filtros
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Verificar si hay filtros activos
+  const hasActiveFilters =
+    filters.category || filters.startDate || filters.endDate;
+
+  // Limpiar filtros
+  const clearFilters = () => {
+    setFilters({
+      category: "",
+      startDate: "",
+      endDate: "",
+    });
+  };
+
   if (transactionsLoading) {
     return (
       <div className="loading-container">
@@ -102,9 +132,7 @@ export default function TransactionManagement() {
     return (
       <div className="error-container">
         <div>Error al cargar transacciones</div>
-        <div style={{ fontSize: "14px", marginTop: "8px" }}>
-          {transactionsError.message}
-        </div>
+        <div className="error-detail">{transactionsError.message}</div>
       </div>
     );
   }
@@ -156,7 +184,67 @@ export default function TransactionManagement() {
         >
           {showForm ? "Cancelar" : "Nueva Transacción"}
         </button>
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`filter-btn ${hasActiveFilters ? "active" : ""}`}
+        >
+          {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+          {hasActiveFilters && <span className="filter-indicator">●</span>}
+        </button>
       </div>
+
+      {/* Filtros */}
+      {showFilters && (
+        <div className="filters-container">
+          <h3>Filtrar Transacciones</h3>
+          <div className="filters-form">
+            <div className="filter-group">
+              <label htmlFor="filterCategory">Categoría</label>
+              <select
+                id="filterCategory"
+                name="category"
+                value={filters.category}
+                onChange={handleFilterChange}
+              >
+                <option value="">Todas las categorías</option>
+                {categories?.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label htmlFor="startDate">Fecha desde</label>
+              <input
+                type="date"
+                id="startDate"
+                name="startDate"
+                value={filters.startDate}
+                onChange={handleFilterChange}
+              />
+            </div>
+
+            <div className="filter-group">
+              <label htmlFor="endDate">Fecha hasta</label>
+              <input
+                type="date"
+                id="endDate"
+                name="endDate"
+                value={filters.endDate}
+                onChange={handleFilterChange}
+              />
+            </div>
+
+            <div className="filter-actions">
+              <button onClick={clearFilters} className="clear-filters-btn">
+                Limpiar Filtros
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Formulario */}
       {showForm && (
@@ -242,60 +330,72 @@ export default function TransactionManagement() {
 
       {/* Lista de transacciones */}
       <div className="transactions-list">
-        <h3>Historial de Transacciones</h3>
+        <div className="transactions-header">
+          <h3>Historial de Transacciones</h3>
+          {hasActiveFilters && (
+            <div className="active-filters-info">
+              <span>Filtros aplicados</span>
+              <button onClick={clearFilters} className="clear-quick-btn">
+                Limpiar
+              </button>
+            </div>
+          )}
+        </div>
 
         {transactions && transactions.length > 0 ? (
-          <div className="transactions-grid">
-            {transactions.map((transaction) => {
-              const formattedTransaction =
-                formatTransactionForDisplay(transaction);
-              return (
-                <div
-                  key={transaction._id}
-                  className={`transaction-card ${transaction.type}`}
-                >
-                  <div className="transaction-header">
-                    <span className={`transaction-type ${transaction.type}`}>
-                      {formattedTransaction.typeLabel}
-                    </span>
-                    <span className="transaction-date">
-                      {formattedTransaction.formattedDate}
-                    </span>
-                  </div>
+          <div className="transactions-content">
+            <div className="transactions-grid">
+              {transactions.map((transaction) => {
+                const formattedTransaction =
+                  formatTransactionForDisplay(transaction);
+                return (
+                  <div
+                    key={transaction._id}
+                    className={`transaction-card ${transaction.type}`}
+                  >
+                    <div className="transaction-header">
+                      <span className={`transaction-type ${transaction.type}`}>
+                        {formattedTransaction.typeLabel}
+                      </span>
+                      <span className="transaction-date">
+                        {formattedTransaction.formattedDate}
+                      </span>
+                    </div>
 
-                  <div className="transaction-content">
-                    <div className="transaction-amount">
-                      {formattedTransaction.formattedAmount}
-                    </div>
-                    <div className="transaction-category">
-                      {formattedTransaction.categoryName}
-                    </div>
-                    {transaction.description && (
-                      <div className="transaction-description">
-                        {transaction.description}
+                    <div className="transaction-content">
+                      <div className="transaction-amount">
+                        {formattedTransaction.formattedAmount}
                       </div>
-                    )}
-                  </div>
+                      <div className="transaction-category">
+                        {formattedTransaction.categoryName}
+                      </div>
+                      {transaction.description && (
+                        <div className="transaction-description">
+                          {transaction.description}
+                        </div>
+                      )}
+                    </div>
 
-                  <div className="transaction-actions">
-                    <button
-                      onClick={() => handleEdit(transaction)}
-                      className="edit-btn"
-                      title="Editar transacción"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => handleDelete(transaction._id)}
-                      className="delete-btn"
-                      title="Eliminar transacción"
-                    >
-                      🗑️
-                    </button>
+                    <div className="transaction-actions">
+                      <button
+                        onClick={() => handleEdit(transaction)}
+                        className="edit-btn"
+                        title="Editar transacción"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDelete(transaction._id)}
+                        className="delete-btn"
+                        title="Eliminar transacción"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className="empty-state">
