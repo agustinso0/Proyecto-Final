@@ -6,19 +6,40 @@ const logger = require("../utils/logger");
 const mongoose = require("mongoose");
 
 class TransactionService {
-  async getAllTransactions(userId) {
+  async getAllTransactions(userId, filters = {}) {
     try {
-      const transactions = await Transaction.find({
+      // Construir la query base
+      const query = {
         userId,
         isActive: true,
-      })
+      };
+
+      // Agregar filtros si existen
+      if (filters.category) {
+        query.category = filters.category;
+      }
+
+      // Filtro por fechas
+      if (filters.startDate || filters.endDate) {
+        query.createdAt = {};
+        
+        if (filters.startDate) {
+          query.createdAt.$gte = new Date(filters.startDate);
+        }
+        
+        if (filters.endDate) {
+          // Agregar 1 día para incluir todo el día final
+          const endDate = new Date(filters.endDate);
+          endDate.setDate(endDate.getDate() + 1);
+          query.createdAt.$lt = endDate;
+        }
+      }
+
+      const transactions = await Transaction.find(query)
         .populate("category", "name description")
         .sort({ createdAt: -1 });
 
-      const total = await Transaction.countDocuments({
-        userId,
-        isActive: true,
-      });
+      const total = await Transaction.countDocuments(query);
 
       return {
         transactions,
