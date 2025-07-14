@@ -48,6 +48,7 @@ const getTransaction = async (req, res, next) => {
 
 const createTransaction = async (req, res, next) => {
   try {
+    console.log("Creating transaction with data:", req.body);
     const transactionData = {
       ...req.body,
       userId: req.user._id,
