@@ -14,173 +14,218 @@ const generateToken = (userId) => {
   return { sessionToken };
 };
 
-const register = async (req, res) => {
-  const { firstname, lastname, email, password, balance = 0 } = req.body;
+const register = async (req, res, next) => {
+  try {
+    const { firstname, lastname, email, password, balance = 0 } = req.body;
 
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new ApiError(400, "El email ya esta registrado");
-  }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw new ApiError(400, "El email ya esta registrado");
+    }
 
-  const user = new User({
-    firstname,
-    lastname,
-    email,
-    password,
-    balance,
-  });
+    const user = new User({
+      firstname,
+      lastname,
+      email,
+      password,
+      balance,
+    });
 
-  await user.save();
+    await user.save();
 
-  const { sessionToken } = generateToken(user._id);
+    const { sessionToken } = generateToken(user._id);
 
-  const auth = new Auth({
-    user: user._id,
-    sessionToken,
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 horas
-  });
+    const auth = new Auth({
+      user: user._id,
+      sessionToken,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 horas
+    });
 
-  await auth.save();
+    await auth.save();
 
-  logger.info(`Nuevo usuario registrado: ${email}`);
+    logger.info(`Nuevo usuario registrado: ${email}`);
 
-  res.status(201).json(
-    new ApiResponse(
-      201,
-      {
-        user: {
-          id: user._id,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          fullName: user.fullName,
-          email: user.email,
-          balance: user.balance,
-          isActive: user.isActive,
-          createdAt: user.createdAt,
+    res.status(201).json(
+      new ApiResponse(
+        201,
+        {
+          user: {
+            id: user._id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            fullName: user.fullName,
+            email: user.email,
+            balance: user.balance,
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+          },
+          sessionToken,
+          sessionId: auth._id,
         },
-        sessionToken,
-        sessionId: auth._id,
-      },
-      "Usuario registrado exitosamente"
-    )
-  );
+        "Usuario registrado exitosamente"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
 };
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email, isActive: true }).select(
-    "+password"
-  );
+    const user = await User.findOne({ email, isActive: true }).select(
+      "+password"
+    );
 
-  if (!user || !(await user.comparePassword(password))) {
-    throw new ApiError(401, "Credenciales invalidas");
-  }
+    if (!user || !(await user.comparePassword(password))) {
+      throw new ApiError(401, "Credenciales invalidas");
+    }
 
-  await Auth.updateMany(
-    { user: user._id, isActive: true },
-    { isActive: false }
-  );
+    await Auth.updateMany(
+      { user: user._id, isActive: true },
+      { isActive: false }
+    );
 
-  const { sessionToken } = generateToken(user._id);
+    const { sessionToken } = generateToken(user._id);
 
-  const auth = new Auth({
-    user: user._id,
-    sessionToken,
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  });
+    const auth = new Auth({
+      user: user._id,
+      sessionToken,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
 
-  await auth.save();
+    await auth.save();
 
-  logger.info(`Inicio de sesion: ${email}`);
+    logger.info(`Inicio de sesion: ${email}`);
 
-  res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        user: {
-          id: user._id,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          fullName: user.fullName,
-          email: user.email,
-          balance: user.balance,
-          isActive: user.isActive,
+    res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          user: {
+            id: user._id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            fullName: user.fullName,
+            email: user.email,
+            balance: user.balance,
+            isActive: user.isActive,
+          },
+          sessionToken,
+          sessionId: auth._id,
         },
-        sessionToken,
-        sessionId: auth._id,
-      },
-      "Inicio de sesion exitoso"
-    )
-  );
-};
-
-const logout = async (req, res) => {
-  const authSession = await Auth.findById(req.auth.sessionId);
-
-  if (authSession) {
-    await authSession.invalidateSession();
-    logger.info(`Cierre de sesion - Usuario: ${req.user.email}`);
+        "Inicio de sesion exitoso"
+      )
+    );
+  } catch (error) {
+    next(error);
   }
-
-  res
-    .status(200)
-    .json(new ApiResponse(200, null, "Sesion cerrada exitosamente"));
 };
 
-const changePassword = async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
+const logout = async (req, res, next) => {
+  try {
+    const authSession = await Auth.findById(req.auth.sessionId);
 
-  const user = await User.findById(req.user.id).select("+password");
+    if (authSession) {
+      await authSession.invalidateSession();
+      logger.info(`Cierre de sesion - Usuario: ${req.user.email}`);
+    }
 
-  if (!(await user.comparePassword(currentPassword))) {
-    throw new ApiError(400, "Contraseña actual incorrecta");
+    res
+      .status(200)
+      .json(new ApiResponse(200, null, "Sesion cerrada exitosamente"));
+  } catch (error) {
+    next(error);
   }
-
-  user.password = newPassword;
-  await user.save();
-
-  await Auth.updateMany(
-    { user: user._id, isActive: true },
-    { isActive: false }
-  );
-
-  logger.info(`Cambio de contraseña - Usuario: ${user.email}`);
-
-  res
-    .status(200)
-    .json(new ApiResponse(200, null, "Contraseña actualizada exitosamente"));
 };
 
-const getUserSessions = async (req, res) => {
-  const sessions = await Auth.find({
-    user: req.user.id,
-    isActive: true,
-  }).select("loginAt expiresAt");
+const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
 
-  res
-    .status(200)
-    .json(new ApiResponse(200, sessions, "Sesiones obtenidas exitosamente"));
-};
+    const user = await User.findById(req.user.id).select("+password");
 
-const invalidateSession = async (req, res) => {
-  const { sessionId } = req.params;
+    if (!(await user.comparePassword(currentPassword))) {
+      throw new ApiError(400, "Contraseña actual incorrecta");
+    }
 
-  const session = await Auth.findOne({
-    _id: sessionId,
-    user: req.user.id,
-    isActive: true,
-  });
+    user.password = newPassword;
+    await user.save();
 
-  if (!session) {
-    throw new ApiError(404, "Sesion no encontrada");
+    await Auth.updateMany(
+      { user: user._id, isActive: true },
+      { isActive: false }
+    );
+
+    logger.info(`Cambio de contraseña - Usuario: ${user.email}`);
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, null, "Contraseña actualizada exitosamente"));
+  } catch (error) {
+    next(error);
   }
+};
 
-  await session.invalidateSession();
+const getUserSessions = async (req, res, next) => {
+  try {
+    const sessions = await Auth.find({
+      user: req.user.id,
+      isActive: true,
+    }).select("loginAt expiresAt");
 
-  res
-    .status(200)
-    .json(new ApiResponse(200, null, "Sesion invalidada exitosamente"));
+    res
+      .status(200)
+      .json(new ApiResponse(200, sessions, "Sesiones obtenidas exitosamente"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+const invalidateSession = async (req, res, next) => {
+  try {
+    const { sessionId } = req.params;
+
+    const session = await Auth.findOne({
+      _id: sessionId,
+      user: req.user.id,
+      isActive: true,
+    });
+
+    if (!session) {
+      throw new ApiError(404, "Sesion no encontrada");
+    }
+
+    await session.invalidateSession();
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, null, "Sesion invalidada exitosamente"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+const me = async (req, res, next) => {
+  try {
+    const user = {
+      id: req.user._id,
+      firstname: req.user.firstname,
+      lastname: req.user.lastname,
+      fullName: req.user.fullName,
+      email: req.user.email,
+      balance: req.user.balance,
+      isActive: req.user.isActive,
+      createdAt: req.user.createdAt,
+    };
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, { user }, "Usuario obtenido exitosamente"));
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
@@ -190,4 +235,5 @@ module.exports = {
   changePassword,
   getUserSessions,
   invalidateSession,
+  me,
 };
