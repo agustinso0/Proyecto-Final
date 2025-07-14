@@ -53,6 +53,7 @@ const LoginForm = ({ onSuccess, onRegisterClick }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Login form submitted, preventing default behavior');
 
     if (!validateForm()) {
       return;
@@ -62,13 +63,22 @@ const LoginForm = ({ onSuccess, onRegisterClick }) => {
 
     try {
       const loginData = formatLoginData(formData);
+      console.log('Attempting login with data:', { ...loginData, password: '[HIDDEN]' });
+      
       const result = await login(loginData);
+      console.log('Login successful, result:', { 
+        user: result?.user?.email, 
+        hasToken: !!result?.sessionToken 
+      });
 
       showSuccessNotification("Inicio de sesión exitoso");
 
       if (onSuccess) {
+        console.log('Calling onSuccess callback');
         onSuccess(result);
       }
+      
+      console.log('Login process completed, current URL:', window.location.href);
     } catch (error) {
       console.error("Error en login:", error);
       showErrorNotification(error);
