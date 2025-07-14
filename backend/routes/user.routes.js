@@ -9,12 +9,10 @@ const {
 const validateRequest = require("../middleware/validateRequest");
 const { authenticate } = require("../middleware/auth");
 
-// Publica
-router.get("/email/:email", userController.getUserByEmail);
-
 router.use(authenticate);
 
 // Protegidas
+router.get("/email/:email", userController.getUserByEmail);
 router.get("/", userController.getAll);
 router.get("/:id", userIdValidation(), validateRequest, userController.getOne);
 router.post("/", userValidationRules(), validateRequest, userController.create);

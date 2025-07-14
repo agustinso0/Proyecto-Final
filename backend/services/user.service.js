@@ -6,9 +6,7 @@ const logger = require("../utils/logger");
 class UserService {
   async getAllUsers() {
     try {
-      const users = await User.find({ isActive: true })
-        .populate("auth", "username isActive lastLogin") // Solo selecciona los campos del segundo parametro
-        .sort({ createdAt: -1 });
+      const users = await User.find({ isActive: true }).sort({ createdAt: -1 });
 
       const total = await User.countDocuments({
         isActive: true,
@@ -26,10 +24,7 @@ class UserService {
 
   async getUserById(id) {
     try {
-      const user = await User.findOne({ _id: id, isActive: true }).populate(
-        "auth",
-        "username isActive lastLogin"
-      );
+      const user = await User.findOne({ _id: id, isActive: true });
 
       if (!user) {
         throw new ApiError(404, "Usuario no encontrado");
@@ -45,19 +40,6 @@ class UserService {
 
   async createUser(userData) {
     try {
-      const authExists = await Auth.findById(userData.auth);
-      if (!authExists) {
-        throw new ApiError(400, "Referencia de autenticacion no valida");
-      }
-
-      const existingUser = await User.findOne({ auth: userData.auth });
-      if (existingUser) {
-        throw new ApiError(
-          400,
-          "Esta cuenta de autenticacion ya esta asociada con un usuario"
-        );
-      }
-
       const emailExists = await User.findOne({ email: userData.email });
       if (emailExists) {
         throw new ApiError(400, "El email ya esta registrado");
@@ -66,12 +48,13 @@ class UserService {
       const user = new User(userData);
       await user.save();
 
-      await user.populate("auth", "username isActive lastLogin");
-
       logger.info(`Usuario creado: ${user.email}`);
       return user;
     } catch (error) {
       if (error instanceof ApiError) throw error;
+      if (error.code === 11000) {
+        throw new ApiError(400, "El email ya esta registrado");
+      }
       logger.error("Error al crear un usuario:", error);
       throw new ApiError(500, "Error al crear usuario");
     }
@@ -79,7 +62,7 @@ class UserService {
 
   async updateUser(id, updateData) {
     try {
-      delete updateData.auth;
+      delete updateData.password;
 
       if (updateData.email) {
         const emailExists = await User.findOne({
@@ -95,7 +78,7 @@ class UserService {
         { _id: id, isActive: true },
         updateData,
         { new: true, runValidators: true }
-      ).populate("auth", "username isActive lastLogin");
+      );
 
       if (!user) {
         throw new ApiError(404, "Usuario no encontrado");
@@ -105,6 +88,9 @@ class UserService {
       return user;
     } catch (error) {
       if (error instanceof ApiError) throw error;
+      if (error.code === 11000) {
+        throw new ApiError(400, "El email ya esta registrado");
+      }
       logger.error("Error al actualizar un usuario:", error);
       throw new ApiError(500, "Error al actualizar usuario");
     }
@@ -122,7 +108,7 @@ class UserService {
         throw new ApiError(404, "Usuario no encontrado");
       }
 
-      await Auth.findByIdAndUpdate(user.auth, { isActive: false });
+      await Auth.updateMany({ user: id, isActive: true }, { isActive: false });
 
       logger.info(`Usuario desactivado (soft): ${user.email}`);
       return { message: "Usuario eliminado correctamente" };
@@ -135,10 +121,7 @@ class UserService {
 
   async getUserByEmail(email) {
     try {
-      const user = await User.findOne({ email, isActive: true }).populate(
-        "auth",
-        "username isActive lastLogin"
-      );
+      const user = await User.findOne({ email, isActive: true });
       return user;
     } catch (error) {
       logger.error("Error al obtener un usuario por email:", error);
@@ -146,7 +129,7 @@ class UserService {
     }
   }
 
-  async updateUserBalance(id, amount, operation = "sumar") {
+  async updateUserBalance(id, amount, operation = "add") {
     try {
       const user = await User.findOne({ _id: id, isActive: true });
       if (!user) {
@@ -154,28 +137,68 @@ class UserService {
       }
 
       let newBalance;
-      if (operation === "sumar") {
+      if (operation === "add") {
         newBalance = user.balance + amount;
-      } else if (operation === "restar") {
+      } else if (operation === "subtract") {
         newBalance = user.balance - amount;
         if (newBalance < 0) {
           throw new ApiError(400, "Balance insuficiente");
         }
       } else {
-        throw new ApiError(400, "Operacion no valida");
+        throw new ApiError(400, "Operacion no valida. Use 'add' o 'subtract'");
       }
 
       user.balance = newBalance;
       await user.save();
 
       logger.info(
-        `Se actualizo el dinero de: ${user.email}, nueva cantidad: ${newBalance}`
+        `Balance actualizado para: ${user.email}, nuevo balance: ${newBalance}`
       );
       return user;
     } catch (error) {
       if (error instanceof ApiError) throw error;
       logger.error("Error al actualizar el balance de un usuario:", error);
       throw new ApiError(500, "Error al actualizar balance del usuario");
+    }
+  }
+
+  async updateUserPassword(id, newPassword) {
+    try {
+      const user = await User.findOne({ _id: id, isActive: true });
+      if (!user) {
+        throw new ApiError(404, "Usuario no encontrado");
+      }
+
+      user.password = newPassword;
+      await user.save();
+
+      await Auth.updateMany({ user: id, isActive: true }, { isActive: false });
+
+      logger.info(`Contraseña actualizada para: ${user.email}`);
+      return { message: "Contraseña actualizada correctamente" };
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      logger.error("Error al actualizar contraseña:", error);
+      throw new ApiError(500, "Error al actualizar contraseña");
+    }
+  }
+
+  async getUserSessions(id) {
+    try {
+      const user = await User.findOne({ _id: id, isActive: true });
+      if (!user) {
+        throw new ApiError(404, "Usuario no encontrado");
+      }
+
+      const sessions = await Auth.find({
+        user: id,
+        isActive: true,
+      }).select("loginAt expiresAt");
+
+      return sessions;
+    } catch (error) {
+      logger.error("Error al obtener sesiones del usuario:", error);
+      throw new ApiError(500, "Error al obtener sesiones");
     }
   }
 }

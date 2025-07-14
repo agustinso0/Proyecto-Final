@@ -165,3 +165,7 @@ public/uploads/
 
 # Local development
 .local
+
+# Test files
+backend/tests/*
+backend/jest.config.js

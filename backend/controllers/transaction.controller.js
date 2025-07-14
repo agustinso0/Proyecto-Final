@@ -1,64 +1,109 @@
 const TransactionService = require("../services/transaction.service");
-const ApiResponse = require("../middleware/ApiResponse");
+const ApiResponse = require("../utils/ApiResponse");
 
 const getAllTransactions = async (req, res) => {
-    try {
-        const transactions = await TransactionService.getAllTransaction();
-        res.status(200).json(new ApiResponse(200, transactions, "Transacciones encontradas correctamente"));
-    } catch (error) {
-        res.status(500).json(new ApiResponse(500, null, "Transacciones no encontradas"))
-    }
+  // Extraer filtros de los query parameters
+  const filters = {};
+  
+  if (req.query.category) {
+    filters.category = req.query.category;
+  }
+  
+  if (req.query.startDate) {
+    filters.startDate = req.query.startDate;
+  }
+  
+  if (req.query.endDate) {
+    filters.endDate = req.query.endDate;
+  }
+
+  const result = await TransactionService.getAllTransactions(req.user._id, filters);
+  res
+    .status(200)
+    .json(new ApiResponse(200, result, "Transacciones obtenidas exitosamente"));
+};
+
+const getTransaction = async (req, res) => {
+  const transaction = await TransactionService.getTransactionById(
+    req.params.id,
+    req.user._id
+  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, transaction, "Transacción encontrada"));
 };
 
 const createTransaction = async (req, res) => {
-    try {
-        const transactionData = {
-            amount: req.body.amount,
-            type: req.body.type,
-            category: req.body.category,
-            description: req.body.description
-        };
-        const transaction = await TransactionService.createTransaction(transactionData);
-        res.status(201).json(new ApiResponse(201, transaction, "Transacción creada correctamente"));
-    } catch (error) {
-        console.error('Error al crear transacción:', error);
-        res.status(500).json(new ApiResponse(500, null, "Error al crear la transacción"));
-    }
+  const transactionData = {
+    ...req.body,
+    userId: req.user._id,
+  };
+  const newTransaction = await TransactionService.createTransaction(
+    transactionData
+  );
+  res
+    .status(201)
+    .json(
+      new ApiResponse(201, newTransaction, "Transacción creada exitosamente")
+    );
+};
+
+const updateTransaction = async (req, res) => {
+  const updatedTransaction = await TransactionService.updateTransaction(
+    req.params.id,
+    req.body,
+    req.user._id
+  );
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        updatedTransaction,
+        "Transacción actualizada exitosamente"
+      )
+    );
 };
 
 const deleteTransaction = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const transaction = await TransactionService.deleteTransaction(id);
-        res.status(200).json(new ApiResponse(200, transaction, "Transacción eliminada correctamente"));
-    } catch (error) {
-        console.error('Error al eliminar transacción:', error);
-        if (error.message === "Transacción no encontrada") {
-            res.status(404).json(new ApiResponse(404, null, "Transacción no encontrada"));
-        } else {
-            res.status(500).json(new ApiResponse(500, null, "Error al eliminar la transacción"));
-        }
-    }
+  const result = await TransactionService.deleteTransaction(
+    req.params.id,
+    req.user._id
+  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, result, "Transacción eliminada exitosamente"));
 };
 
-const getSummary = async (req, res, next) => {
-    try {
-        const userId = req.user._id;
-        const summary = await TransactionService.getSummary(userId);
-        res.status(200).json({
-            statusCode: 200,
-            data: summary,
-            message: "Resumen generado correctamente",
-            success: true
-        });
-    } catch (error) {
-        next(error);
-    }
+const getSummary = async (req, res) => {
+  const summary = await TransactionService.getSummary(req.user._id);
+  res
+    .status(200)
+    .json(new ApiResponse(200, summary, "Resumen generado exitosamente"));
+};
+
+const getTransactionsByCategory = async (req, res) => {
+  const transactions = await TransactionService.getTransactionsByCategory(
+    req.params.categoryId,
+    req.user._id
+  );
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        transactions,
+        "Transacciones por categoría obtenidas exitosamente"
+      )
+    );
 };
 
 module.exports = {
-    getAllTransactions,
-    createTransaction,
-    deleteTransaction,
-    getSummary
+  getAllTransactions,
+  getTransaction,
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+  getSummary,
+  getTransactionsByCategory,
 };

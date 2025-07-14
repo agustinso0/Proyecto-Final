@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Principales páginas de la aplicación
+Allow: /transacciones
+Allow: /categorias
+Allow: /usuarios
+
+# Bloquear páginas privadas/admin si las hubiera
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://control-gastos-app.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
