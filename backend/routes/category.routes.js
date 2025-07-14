@@ -15,9 +15,7 @@ const {
 } = require("../validators/category.validator");
 
 const router = express.Router();
-
 router.use(authenticate);
-
 router.get("/", getAllCategories);
 router.get("/:id", categoryIdValidation(), validateRequest, getCategory);
 router.post("/", categoryValidationRules(), validateRequest, createCategory);
