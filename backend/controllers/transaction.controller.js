@@ -2,7 +2,22 @@ const TransactionService = require("../services/transaction.service");
 const ApiResponse = require("../utils/ApiResponse");
 
 const getAllTransactions = async (req, res) => {
-  const result = await TransactionService.getAllTransactions(req.user._id);
+  // Extraer filtros de los query parameters
+  const filters = {};
+  
+  if (req.query.category) {
+    filters.category = req.query.category;
+  }
+  
+  if (req.query.startDate) {
+    filters.startDate = req.query.startDate;
+  }
+  
+  if (req.query.endDate) {
+    filters.endDate = req.query.endDate;
+  }
+
+  const result = await TransactionService.getAllTransactions(req.user._id, filters);
   res
     .status(200)
     .json(new ApiResponse(200, result, "Transacciones obtenidas exitosamente"));
