@@ -76,9 +76,41 @@ const categoryIdValidation = () => [
   }),
 ];
 
+const transactionFiltersValidation = () => [
+  query("category")
+    .optional()
+    .custom((value) => {
+      if (value && !mongoose.Types.ObjectId.isValid(value)) {
+        throw new Error("ID de categoría no válido");
+      }
+      return true;
+    }),
+  
+  query("startDate")
+    .optional()
+    .isISO8601()
+    .withMessage("Fecha de inicio debe estar en formato ISO8601 (YYYY-MM-DD)"),
+  
+  query("endDate")
+    .optional()
+    .isISO8601()
+    .withMessage("Fecha de fin debe estar en formato ISO8601 (YYYY-MM-DD)")
+    .custom((endDate, { req }) => {
+      if (endDate && req.query.startDate) {
+        const start = new Date(req.query.startDate);
+        const end = new Date(endDate);
+        if (end < start) {
+          throw new Error("La fecha de fin debe ser posterior a la fecha de inicio");
+        }
+      }
+      return true;
+    }),
+];
+
 module.exports = {
   transactionValidationRules,
   transactionUpdateValidationRules,
   transactionIdValidation,
   categoryIdValidation,
+  transactionFiltersValidation,
 };
