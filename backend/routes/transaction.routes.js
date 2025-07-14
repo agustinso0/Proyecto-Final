@@ -15,6 +15,7 @@ const {
   transactionUpdateValidationRules,
   transactionIdValidation,
   categoryIdValidation,
+  transactionFiltersValidation,
 } = require("../validators/transaction.validator");
 
 const router = express.Router();
@@ -22,7 +23,7 @@ const router = express.Router();
 router.use(authenticate);
 
 // Rutas principales
-router.get("/", getAllTransactions);
+router.get("/", transactionFiltersValidation(), validateRequest, getAllTransactions);
 router.get("/summary", getSummary);
 router.get(
   "/category/:categoryId",
