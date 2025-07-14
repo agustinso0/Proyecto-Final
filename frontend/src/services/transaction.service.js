@@ -17,6 +17,10 @@ export const validateTransactionDataForCreation = (data) => {
     errors.push("La descripción no puede exceder 500 caracteres");
   }
 
+  if (data.user && !data.user.id) {
+    errors.push("El ID de usuario es obligatorio");
+  }
+
   return errors;
 };
 
@@ -40,6 +44,7 @@ export const validateTransactionDataForEdit = (data) => {
 
 export const formatTransactionForCreate = (data) => {
   return {
+    userId: data.userId,
     amount: parseFloat(data.amount),
     type: data.type,
     category: data.category,
