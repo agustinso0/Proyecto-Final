@@ -97,20 +97,40 @@ class CategoryService {
 
   async deleteCategory(id) {
     try {
+      const existingCategory = await Category.findById(id);
+
+      if (!existingCategory) {
+        logger.warn(`Categoría no encontrada con ID: ${id}`);
+        throw new ApiError(404, "Categoría no encontrada");
+      }
+
+      logger.info(
+        `Categoría encontrada: ${existingCategory.name}, isActive: ${existingCategory.isActive}`
+      );
+
+      if (!existingCategory.isActive) {
+        logger.warn(
+          `Intento de eliminar categoría ya inactiva: ${existingCategory.name}`
+        );
+        throw new ApiError(400, "La categoría ya está eliminada");
+      }
+
       const category = await Category.findOneAndUpdate(
         { _id: id, isActive: true },
         { isActive: false },
         { new: true }
       );
 
-      if (!category) {
-        throw new ApiError(404, "Categoría no encontrada");
-      }
-
       logger.info(`Categoría desactivada (soft): ${category.name}`);
       return { message: "Categoría eliminada correctamente" };
     } catch (error) {
       if (error instanceof ApiError) throw error;
+
+      if (error.name === "CastError" && error.kind === "ObjectId") {
+        logger.error(`ID de categoría no válido: ${id}`);
+        throw new ApiError(400, "ID de categoría no válido");
+      }
+
       logger.error("Error al eliminar una categoría:", error);
       throw new ApiError(500, "Error al eliminar categoría");
     }
