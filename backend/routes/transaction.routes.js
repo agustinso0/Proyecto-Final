@@ -22,8 +22,12 @@ const router = express.Router();
 
 router.use(authenticate);
 
-// Rutas principales
-router.get("/", transactionFiltersValidation(), validateRequest, getAllTransactions);
+router.get(
+  "/",
+  transactionFiltersValidation(),
+  validateRequest,
+  getAllTransactions
+);
 router.get("/summary", getSummary);
 router.get(
   "/category/:categoryId",
