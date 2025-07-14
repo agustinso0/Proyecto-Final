@@ -25,6 +25,8 @@ router.post(
 
 router.use(authenticate);
 
+router.get("/me", authController.me);
+
 router.post("/logout", authController.logout);
 
 router.put(
