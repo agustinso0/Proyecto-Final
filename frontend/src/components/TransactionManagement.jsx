@@ -7,10 +7,12 @@ import {
 import { useCategories } from "../hooks/useCategory";
 import { formatTransactionForDisplay } from "../services/transaction.service";
 import "../styles/transactions.css";
+import { useAuth } from "../hooks/useAuth";
 
 export default function TransactionManagement() {
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     amount: "",
     type: "expense",
@@ -56,10 +58,14 @@ export default function TransactionManagement() {
       if (editingTransaction) {
         await updateTransaction.mutateAsync({
           id: editingTransaction._id,
+          userId: user.id,
           transactionData: formData,
         });
       } else {
-        await createTransaction.mutateAsync(formData);
+        await createTransaction.mutateAsync({
+          ...formData,
+          userId: user.id,
+        });
       }
       resetForm();
     } catch (error) {
