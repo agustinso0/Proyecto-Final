@@ -1,9 +1,27 @@
 import apiClient from "../api/apiClient";
 import { handleApiError, retryRequest } from "../utils/errorHandler";
 
-export const getAll = async () => {
+export const getAll = async (filters = {}) => {
   try {
-    const response = await retryRequest(() => apiClient.get("/transactions"));
+    // Construir query parameters
+    const queryParams = new URLSearchParams();
+    
+    if (filters.category) {
+      queryParams.append('category', filters.category);
+    }
+    
+    if (filters.startDate) {
+      queryParams.append('startDate', filters.startDate);
+    }
+    
+    if (filters.endDate) {
+      queryParams.append('endDate', filters.endDate);
+    }
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `/transactions?${queryString}` : '/transactions';
+    
+    const response = await retryRequest(() => apiClient.get(url));
     return response.data.data?.transactions || [];
   } catch (error) {
     throw handleApiError(error);
