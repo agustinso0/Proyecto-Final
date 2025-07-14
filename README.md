@@ -144,14 +144,10 @@ proyecto-final/
 │   │   ├── 📁 utils/              # Utilidades del frontend
 │   │   │   ├── ApiError.js        # Manejo de errores de API
 │   │   │   └── errorHandler.js    # Manejador global de errores
-│   │   ├── 📁 __tests__/          # Tests del frontend
-│   │   │   └── 📁 components/     # Tests de componentes
-│   │   │       └── SEOHead.test.js # Test del componente SEO
 │   │   ├── App.css                # Estilos principales de la aplicación
 │   │   ├── App.js                 # Componente raíz de React
 │   │   ├── index.css              # Estilos globales
 │   │   ├── index.js               # Punto de entrada de React
-│   │   └── setupTests.js          # Configuración de tests
 │   ├── .env.development           # Variables de entorno de desarrollo
 │   ├── craco.config.js            # Configuración de CRACO
 │   ├── Dockerfile                 # Imagen Docker para producción
@@ -887,7 +883,6 @@ CORS_ORIGIN=https://yourdomain.com
 - **Express.js:** [Guía de Express](https://expressjs.com/guide/)
 - **React:** [Documentación React](https://react.dev/)
 - **Docker:** [Docker Documentation](https://docs.docker.com/)
-- **Jest:** [Testing con Jest](https://jestjs.io/docs/getting-started)
 
 ### 🛠️ **Herramientas de Desarrollo**
 
