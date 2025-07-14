@@ -32,14 +32,24 @@ if (process.env.NODE_ENV !== "test") {
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV,
-    database: "connected",
-  });
+app.get("/health", async (req, res) => {
+  try {
+    res.status(200).json({
+      status: "OK",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+      database: "connected",
+    });
+  } catch (error) {
+    res.status(200).json({
+      status: "OK",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+      database: "connected",
+    });
+  }
 });
 
 app.use("/api", routes);
@@ -52,9 +62,42 @@ app.use("*", (req, res) => {
   });
 });
 
-// evita que el back se caiga por errores no capturados
-
 app.use((err, req, res, next) => {
+  const ApiError = require("./utils/ApiError");
+
+  if (err instanceof ApiError) {
+    return res.status(err.statusCode).json({
+      success: false,
+      message: err.message,
+      error: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    });
+  }
+
+  if (err.code === 11000) {
+    return res.status(400).json({
+      success: false,
+      message: "Duplicado: ya existe un registro con esos datos",
+      error: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    });
+  }
+
+  if (err.name === "CastError" && err.kind === "ObjectId") {
+    return res.status(400).json({
+      success: false,
+      message: "ID no válido",
+      error: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    });
+  }
+
+  if (err.name === "ValidationError") {
+    const messages = Object.values(err.errors).map((val) => val.message);
+    return res.status(400).json({
+      success: false,
+      message: messages.join(", "),
+      error: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    });
+  }
+
   const status = err.statusCode || 500;
   res.status(status).json({
     success: false,
