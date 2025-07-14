@@ -40,9 +40,7 @@ export default function CategoryList() {
     return (
       <div className="error-container">
         <div>Error al cargar categorías</div>
-        <div style={{ fontSize: "14px", marginTop: "8px" }}>
-          {error.message}
-        </div>
+        <div className="error-detail">{error.message}</div>
       </div>
     );
 
