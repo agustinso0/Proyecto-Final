@@ -5,7 +5,11 @@ const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    throw new ApiError(422, "Errores de validacion");
+    const errorMessages = errors
+      .array()
+      .map((error) => error.msg)
+      .join(", ");
+    throw new ApiError(422, errorMessages);
   }
 
   next();
