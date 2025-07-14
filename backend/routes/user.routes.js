@@ -11,11 +11,12 @@ const { authenticate } = require("../middleware/auth");
 
 router.use(authenticate);
 
-// Protegidas
 router.get("/email/:email", userController.getUserByEmail);
 router.get("/", userController.getAll);
 router.get("/:id", userIdValidation(), validateRequest, userController.getOne);
+
 router.post("/", userValidationRules(), validateRequest, userController.create);
+
 router.put(
   "/:id",
   userIdValidation(),
