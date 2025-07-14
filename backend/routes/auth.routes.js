@@ -34,6 +34,9 @@ router.put(
   authController.changePassword
 );
 
+// Ruta para obtener información del usuario autenticado
+router.get("/me", authController.me);
+
 router.get("/sessions", authController.getUserSessions);
 
 router.delete("/sessions/:sessionId", authController.invalidateSession);

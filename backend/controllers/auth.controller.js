@@ -183,6 +183,23 @@ const invalidateSession = async (req, res) => {
     .json(new ApiResponse(200, null, "Sesion invalidada exitosamente"));
 };
 
+const me = async (req, res) => {
+  const user = {
+    id: req.user._id,
+    firstname: req.user.firstname,
+    lastname: req.user.lastname,
+    fullName: req.user.fullName,
+    email: req.user.email,
+    balance: req.user.balance,
+    isActive: req.user.isActive,
+    createdAt: req.user.createdAt,
+  };
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, { user }, "Usuario obtenido exitosamente"));
+};
+
 module.exports = {
   register,
   login,
@@ -190,4 +207,5 @@ module.exports = {
   changePassword,
   getUserSessions,
   invalidateSession,
+  me,
 };
