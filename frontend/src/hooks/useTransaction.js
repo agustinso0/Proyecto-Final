@@ -18,8 +18,8 @@ import {
 import { createValidationError } from "../services/utils/createValidationError";
 import { handleApiError } from "../utils/errorHandler";
 
-export const useTransactions = () => {
-  return useQuery("transactions", getAll, {
+export const useTransactions = (filters = {}) => {
+  return useQuery(["transactions", filters], () => getAll(filters), {
     staleTime: 1000 * 60 * 2, // 2 minutos
     refetchOnWindowFocus: false,
   });
