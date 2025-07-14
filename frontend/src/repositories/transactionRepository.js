@@ -5,22 +5,22 @@ export const getAll = async (filters = {}) => {
   try {
     // Construir query parameters
     const queryParams = new URLSearchParams();
-    
+
     if (filters.category) {
-      queryParams.append('category', filters.category);
+      queryParams.append("category", filters.category);
     }
-    
+
     if (filters.startDate) {
-      queryParams.append('startDate', filters.startDate);
+      queryParams.append("startDate", filters.startDate);
     }
-    
+
     if (filters.endDate) {
-      queryParams.append('endDate', filters.endDate);
+      queryParams.append("endDate", filters.endDate);
     }
-    
+
     const queryString = queryParams.toString();
-    const url = queryString ? `/transactions?${queryString}` : '/transactions';
-    
+    const url = queryString ? `/transactions?${queryString}` : "/transactions";
+
     const response = await retryRequest(() => apiClient.get(url));
     return response.data.data?.transactions || [];
   } catch (error) {
@@ -45,7 +45,7 @@ export const create = async (transactionData) => {
   if (!transactionData) {
     throw new Error("Datos de transacción requeridos");
   }
-
+  console.log("Creating transaction with data:", transactionData);
   try {
     const response = await apiClient.post("/transactions", transactionData);
     return response.data.data || null;
