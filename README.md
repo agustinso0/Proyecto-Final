@@ -27,7 +27,6 @@ Sistema web completo para la gestión y control de finanzas personales, desarrol
 | **Frontend** | React 18 + CSS Modules | 3000 | Interfaz de usuario moderna y responsiva |
 | **Backend** | Express.js + Mongoose | 3001 | API REST con autenticación JWT |
 | **Database** | MongoDB 7 (Replica Set) | 27018 | Base de datos NoSQL con alta disponibilidad |
-| **Cache** | Redis 7 | 6379 | Cache de sesiones y optimización |
 | **Proxy** | Nginx Alpine | 80 | Reverse proxy y load balancer |
 
 ---
@@ -732,8 +731,7 @@ Respuesta:
   "timestamp": "2025-07-14T10:30:00.000Z",
   "uptime": 1234.567,
   "environment": "development",
-  "database": "connected"
-}
+  "database": "connected",
 ```
 
 ### 📋 **Estructura de Respuestas**
@@ -811,7 +809,6 @@ WATCHPACK_POLLING=true
 
 # Reiniciar servicio frontend
 docker-compose restart frontend
-```
 
 ### 🧹 **Comandos de Limpieza**
 
