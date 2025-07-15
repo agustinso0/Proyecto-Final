@@ -11,11 +11,9 @@ const UsersManagement = () => {
     editingUser,
     handleUpdateUser,
     handleDeleteUser,
-    handleUpdateBalance,
     startEdit,
     cancelEdit,
     isUpdating,
-    isUpdatingBalance,
     updateError,
   } = useUserHandlers();
 
@@ -48,15 +46,6 @@ const UsersManagement = () => {
                 user={user}
                 onEdit={() => startEdit(user)}
                 onDelete={() => handleDeleteUser(user.id, user.fullName)}
-                onUpdateBalance={(amount, operation, currentBalance) =>
-                  handleUpdateBalance(
-                    user.id,
-                    amount,
-                    operation,
-                    currentBalance
-                  )
-                }
-                isUpdatingBalance={isUpdatingBalance}
               />
             )}
           </div>
