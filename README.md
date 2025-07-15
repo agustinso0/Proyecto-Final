@@ -237,7 +237,6 @@ FAST_REFRESH=true
 - **Registro y autenticación** con JWT y sistema de sesiones múltiples
 - **Perfiles completos** con nombre, apellido y email
 - **Gestión de contraseñas** con cambio seguro
-- **Balance personal** con operaciones de suma y resta
 - **Sesiones activas** con capacidad de invalidación individual
 - **Eliminación lógica** para mantener integridad de datos
 
